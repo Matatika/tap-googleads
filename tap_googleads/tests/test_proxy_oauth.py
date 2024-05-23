@@ -4,6 +4,7 @@ import unittest
 
 import responses
 import singer_sdk._singerlib as singer
+import singer_sdk.io_base as io
 
 import tap_googleads.tests.utils as test_utils
 from tap_googleads.tap import TapGoogleAds
@@ -25,7 +26,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         }
         responses.reset()
         del test_utils.SINGER_MESSAGES[:]
-        singer.write_message = test_utils.accumulate_singer_messages
+        io.singer_write_message = test_utils.accumulate_singer_messages
 
     def test_proxy_oauth_discovery(self):
         """Test basic discover sync with proxy refresh credentials"""
@@ -78,7 +79,11 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         )
 
         # Assert that messages are output from sync (its actually working).
-        self.assertEqual(len(test_utils.SINGER_MESSAGES), 3)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.SchemaMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.RecordMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.StateMessage)
+        self.assertEqual(len(test_utils.SINGER_MESSAGES), 14)
+        self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.StateMessage)
+        self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.SchemaMessage)
+        self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.RecordMessage)
+
+        for msg in test_utils.SINGER_MESSAGES[3:]:
+            self.assertIsInstance(msg, singer.StateMessage)
+
