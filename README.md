@@ -36,8 +36,11 @@ Settings required to run this tap.
 - `oauth_credentials.refresh_token` (required)
 - `developer_token` (required)
 - `customer_id` (required)
+- `login_customer_id` (optional)
 - `start_date` (optional)
 - `end_date` (optional)
+
+If using a manager account, `login_customer_id` should be set to the customer ID of the manager account while `customer_id` should be set to the customer ID of the account you want to sync.
 
 How to get these settings can be found in the following Google Ads documentation:
 
