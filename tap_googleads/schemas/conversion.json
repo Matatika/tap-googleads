@@ -1,0 +1,84 @@
+{
+    "type": "object",
+    "properties": {
+        "metrics": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "allConversionsValue": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "allConversions": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "segments": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "date": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date"
+                }
+            }
+        },
+        "conversionAction": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "resourceName": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "category": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "name": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "ownerCustomer": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "origin": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        }
+    }
+}
