@@ -231,6 +231,25 @@ class AdGroupsPerformance(ReportsStream):
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "adgroups_performance.json"
 
+class AdGroupsHistoricalPerformance(ReportsStream):
+    """AdGroups Performance"""
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT campaign.id, ad_group.id, ad_group.status, segments.date, metrics.impressions, metrics.clicks,
+               metrics.cost_micros
+               FROM ad_group
+               WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_adgroupshistoricalperformance"
+    primary_keys = ["campaign__id", "ad_group__id", "segments__date", ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "adgroups_historical_performance.json"
+
+
 
 class CampaignPerformance(ReportsStream):
     """Campaign Performance"""
