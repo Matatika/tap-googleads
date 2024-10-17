@@ -97,6 +97,8 @@ class CustomerHierarchyStream(GoogleAdsStream):
         ),
     ).to_dict()
 
+    seen_customer_ids = set()
+
     def post_process(
         self,
         row: Record,
@@ -143,11 +145,10 @@ class CustomerHierarchyStream(GoogleAdsStream):
         customer_id = record["customerClient"]["id"]
 
         # skip if we've already seen this customer
-        if all(
-            any(ctx["customer_id"] == customer_id for ctx in cs.partitions or [])
-            for cs in self.child_streams
-        ):
+        if customer_id in self.seen_customer_ids:
             return None
+
+        self.seen_customer_ids.add(customer_id)
 
         return {"customer_id": customer_id}
 
