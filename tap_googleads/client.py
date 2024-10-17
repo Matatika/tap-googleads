@@ -1,6 +1,6 @@
 """REST client handling, including GoogleAdsStream base class."""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import cached_property
 from typing import Any, Dict, Optional
 
@@ -18,9 +18,6 @@ class GoogleAdsStream(RESTStream):
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
     _LOG_REQUEST_METRIC_URLS: bool = True
-
-    _end_date = datetime.now()
-    _start_date = _end_date - timedelta(days=91)
 
     @cached_property
     def authenticator(self) -> OAuthAuthenticator:
@@ -101,17 +98,11 @@ class GoogleAdsStream(RESTStream):
 
     @cached_property
     def start_date(self):
-        date = self.config.get("start_date")
-        date = datetime.fromisoformat(date) if date else self._start_date
-
-        return date.strftime(r"'%Y-%m-%d'")
+        return datetime.fromisoformat(self.config["start_date"]).strftime(r"'%Y-%m-%d'")
 
     @cached_property
     def end_date(self):
-        date = self.config.get("end_date")
-        date = datetime.fromisoformat(date) if date else self._end_date
-
-        return date.strftime(r"'%Y-%m-%d'")
+        return datetime.fromisoformat(self.config["end_date"]).strftime(r"'%Y-%m-%d'")
 
     @cached_property
     def customer_ids(self):
