@@ -4,10 +4,17 @@ from datetime import datetime
 from functools import cached_property
 from typing import Any, Dict, Optional
 
+import requests
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
+
+
+class ResumableAPIError(Exception):
+    def __init__(self, message: str, response: requests.Response) -> None:
+        super().__init__(message)
+        self.response = response
 
 
 class GoogleAdsStream(RESTStream):
@@ -85,6 +92,12 @@ class GoogleAdsStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
         return params
+
+    def get_records(self, context):
+        try:
+            yield from super().get_records(context)
+        except ResumableAPIError as e:
+            self.logger.warning(e)
 
     @property
     def gaql(self):

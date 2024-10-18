@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+import datetime
+from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional
+from typing import TYPE_CHECKING, Any, Dict, Iterable
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
-from tap_googleads.client import GoogleAdsStream
+from tap_googleads.client import GoogleAdsStream, ResumableAPIError
 
 if TYPE_CHECKING:
     from singer_sdk.helpers.types import Context, Record
@@ -99,6 +100,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     seen_customer_ids = set()
 
+    def validate_response(self, response):
+        if response.status_code == HTTPStatus.FORBIDDEN:
+            msg = self.response_error_message(response)
+            raise ResumableAPIError(msg, response)
+
+        super().validate_response(response)
+
     def generate_child_contexts(self, record, context):
         customer_ids = self.config.get("customer_ids")
 
@@ -165,9 +173,11 @@ class GeotargetsStream(ReportsStream):
 
 
 class ClickViewReportStream(ReportsStream):
+    date: datetime.date
+
     @property
     def gaql(self):
-        return """
+        return f"""
         SELECT
             click_view.gclid
             , customer.id
@@ -185,7 +195,7 @@ class ClickViewReportStream(ReportsStream):
             , click_view.keyword
             , click_view.keyword_info.match_type
         FROM click_view
-        WHERE segments.date = {date}
+        WHERE segments.date = '{self.date.isoformat()}'
         """
 
     records_jsonpath = "$.results[*]"
@@ -203,8 +213,8 @@ class ClickViewReportStream(ReportsStream):
         "date",
     ]
     replication_key = "date"
+    is_timestamp_replication_key = True
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
-    state_partitioning_keys = []
 
     def post_process(self, row, context):
         row["date"] = row["segments"].pop("date")
@@ -231,99 +241,27 @@ class ClickViewReportStream(ReportsStream):
             params["page"] = next_page_token
         return params
 
-    def get_records(self, context: Optional[dict]) -> Iterable[Dict[str, Any]]:
-        date_list = []
+    def request_records(self, context):
+        start_date = self.get_starting_timestamp(context).date()
+        end_date = datetime.date.fromisoformat(self.config["end_date"])
 
-        replication_values = []
+        delta = end_date - start_date
+        dates = [start_date + datetime.timedelta(days=i) for i in range(1, delta.days)]
 
-        value = self.stream_state.get("replication_key_value", False)
-        if value:
-            replication_values.append(value)
+        for date in dates:
+            self.date = date
+            yield from super().request_records(context)
 
-        # Get the maximum replication_key_value
-        if len(replication_values) > 0:
-            last_replication_date = max(replication_values)
-        else:
-            last_replication_date = None
-
-        yesterdays_date = datetime.now() - timedelta(days=1)
-
-        # if last_replication_date is today or greater, set the date to yesterday (last full days data)
-        if last_replication_date:
-            if last_replication_date >= datetime.now().strftime("%Y-%m-%d"):
-                last_replication_date = yesterdays_date.strftime("%Y-%m-%d")
-
-            # This is if the last_replication_date defaults back to the start date (timestamp)
-            if "T" in last_replication_date:
-                last_replication_date, _ = last_replication_date.split("T")
-
-        current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
-
-        if last_replication_date:
-            current_date = datetime.strptime(
-                last_replication_date.replace("'", ""),
-                "%Y-%m-%d",
+    def validate_response(self, response):
+        if response.status_code == HTTPStatus.FORBIDDEN:
+            error = response.json()["error"]["details"][0]["errors"][0]
+            msg = (
+                "Click view report not accessible to customer "
+                f"'{self.context['customer_id']}': {error['message']}"
             )
+            raise ResumableAPIError(msg, response)
 
-        # Generate a list of dates up to yesterday
-        if current_date < datetime.now() - timedelta(days=1):
-            while current_date < datetime.now() - timedelta(days=1):
-                date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
-                current_date += timedelta(days=1)
-        else:
-            date_list.append("'" + yesterdays_date.strftime("%Y-%m-%d") + "'")
-
-        for date in date_list:
-            context["date"] = date
-            # Call the parent get_records with the modified context (date value)
-            for record in super().get_records(context):
-                yield record
-
-    def sync(self, context):
-        """Sync this stream.
-
-        This method is internal to the SDK and should not need to be overridden.
-
-        Args:
-            context: Stream partition or context dictionary.
-
-        Raises:
-            Exception: Any exception raised by the sync process.
-
-        """
-        msg = f"Beginning {self.replication_method.lower()} sync of '{self.name}'"
-        if context:
-            msg += f" with context: {context}"
-        self.logger.info("%s...", msg)
-
-        # Send a SCHEMA message to the downstream target:
-        if self.selected:
-            self._write_schema_message()
-
-        try:
-            batch_config = self.get_batch_config(self.config)
-            if batch_config:
-                self._sync_batches(batch_config, context=context)
-            else:
-                # Sync the records themselves:
-                for _ in self._sync_records(context=context):
-                    pass
-        except Exception as ex:
-            if hasattr(ex, "response") and ex.response is not None:
-                status_code = ex.response.status_code
-                if status_code not in [400, 403]:
-                    # Raise the exception if it's not 400 or 403
-                    self.logger.exception(
-                        "An unhandled error occurred while syncing '%s'",
-                        self.name,
-                    )
-                    raise ex
-            else:
-                # Log the 400 or 403 error and continue
-                self.logger.exception(
-                    "An unhandled error occurred while syncing '%s'",
-                    self.name,
-                )
+        super().validate_response(response)
 
 
 class CampaignsStream(ReportsStream):
