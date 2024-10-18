@@ -238,7 +238,7 @@ class ClickViewReportStream(ReportsStream):
         """
         params: dict = {}
         if next_page_token:
-            params["page"] = next_page_token
+            params["pageToken"] = next_page_token
         return params
 
     def request_records(self, context):
