@@ -246,7 +246,7 @@ class ClickViewReportStream(ReportsStream):
         end_date = datetime.date.fromisoformat(self.config["end_date"])
 
         delta = end_date - start_date
-        dates = [start_date + datetime.timedelta(days=i) for i in range(1, delta.days)]
+        dates = (start_date + datetime.timedelta(days=i) for i in range(delta.days))
 
         for date in dates:
             self.date = date
