@@ -248,9 +248,13 @@ class ClickViewReportStream(ReportsStream):
         delta = end_date - start_date
         dates = (start_date + datetime.timedelta(days=i) for i in range(delta.days))
 
-        for date in dates:
-            self.date = date
-            yield from super().request_records(context)
+        for self.date in dates:
+            records = list(super().request_records(context))
+
+            if not records:
+                self._increment_stream_state({"date": self.date.isoformat()}, context=self.context)
+
+            yield from records
 
     def validate_response(self, response):
         if response.status_code == HTTPStatus.FORBIDDEN:
