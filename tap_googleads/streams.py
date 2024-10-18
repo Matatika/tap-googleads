@@ -213,7 +213,6 @@ class ClickViewReportStream(ReportsStream):
         "date",
     ]
     replication_key = "date"
-    is_timestamp_replication_key = True
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
 
     def post_process(self, row, context):
@@ -242,7 +241,9 @@ class ClickViewReportStream(ReportsStream):
         return params
 
     def request_records(self, context):
-        start_date = self.get_starting_timestamp(context).date()
+        start_value = self.get_starting_replication_key_value(context)
+
+        start_date =  datetime.date.fromisoformat(start_value)
         end_date = datetime.date.fromisoformat(self.config["end_date"])
 
         delta = end_date - start_date
