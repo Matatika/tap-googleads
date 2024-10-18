@@ -99,58 +99,31 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     seen_customer_ids = set()
 
-    def post_process(
-        self,
-        row: Record,
-        context: Context | None = None,  # noqa: ARG002
-    ) -> dict | None:
-        """As needed, append or transform raw data to match expected structure.
+    def generate_child_contexts(self, record, context):
+        customer_ids = self.config.get("customer_ids")
 
-        Optional. This method gives developers an opportunity to "clean up" the results
-        prior to returning records to the downstream tap - for instance: cleaning,
-        renaming, or appending properties to the raw record result returned from the
-        API.
+        if customer_ids is None:
+            customer = record["customerClient"]
 
-        Developers may also return `None` from this method to filter out
-        invalid or not-applicable records from the stream.
+            if customer["manager"]:
+                self.logger.warning(
+                    "%s is a manager, skipping",
+                    customer["clientCustomer"],
+                )
 
-        Args:
-            row: Individual record in the stream.
-            context: Stream partition or context dictionary.
+            if customer["status"] != "ENABLED":
+                self.logger.warning(
+                    "%s is not enabled, skipping",
+                    customer["clientCustomer"],
+                )
 
-        Returns:
-            The resulting record dict, or `None` if the record should be excluded.
+            customer_ids = {customer["id"]}
 
-        """
-        customer = row["customerClient"]
+        # sync only customers we haven't seen
+        customer_ids = set(customer_ids) - self.seen_customer_ids
+        yield from ({"customer_id": customer_id} for customer_id in customer_ids)
 
-        if self.customer_ids and customer["id"] not in self.customer_ids:
-            return None
-
-        if customer["manager"]:
-            self.logger.warning("%s is a manager, skipping", customer["clientCustomer"])
-            return None
-
-        if customer["status"] != "ENABLED":
-            self.logger.warning(
-                "%s is not enabled, skipping",
-                customer["clientCustomer"],
-            )
-            return None
-
-        return row
-
-    def get_child_context(self, record: dict, context: dict | None) -> dict:  # noqa: ARG002
-        """Return a context dictionary for child streams."""
-        customer_id = record["customerClient"]["id"]
-
-        # skip if we've already seen this customer
-        if customer_id in self.seen_customer_ids:
-            return None
-
-        self.seen_customer_ids.add(customer_id)
-
-        return {"customer_id": customer_id}
+        self.seen_customer_ids.update(customer_ids)
 
 
 class ReportsStream(GoogleAdsStream):
