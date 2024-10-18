@@ -108,14 +108,14 @@ class TapGoogleAds(Tap):
         ),
         th.Property(
             "start_date",
-            th.DateTimeType,
-            description="Start date for all of the streams that use date based filtering.",
+            th.DateType,
+            description="ISO start date for all of the streams that use date-based filtering. Defaults to 90 days before the current day.",
             default=_start_date.isoformat(),
         ),
         th.Property(
             "end_date",
-            th.DateTimeType,
-            description="End date for all of the streams that use date based filtering.",
+            th.DateType,
+            description="ISO end date for all of the streams that use date-based filtering. Defaults to the current day.",
             default=_end_date.isoformat(),
         ),
         th.Property(
