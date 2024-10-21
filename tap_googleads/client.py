@@ -96,7 +96,7 @@ class GoogleAdsStream(RESTStream):
     @property
     def path(self) -> str:
         # Paramas
-        path = "/customers/{customer_id}/googleAds:search?pageSize=10000&query="
+        path = "/customers/{customer_id}/googleAds:search?query="
         return path + self.gaql
 
     @cached_property
