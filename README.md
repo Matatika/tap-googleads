@@ -25,9 +25,19 @@ pip install https://github.com/Matatika/tap-googleads.git
 
 ### Accepted Config Options
 
-### This tap supports two sets of configs:
+A full list of supported settings and capabilities for this tap is available by running:
+
+```bash
+tap-googleads --about
+```
 
 ### Using Your Own Credentials
+
+How to get these settings can be found in the following Google Ads documentation:
+
+https://developers.google.com/adwords/api/docs/guides/authentication
+
+https://developers.google.com/google-ads/api/docs/first-call/dev-token
 
 Required settings:
 
@@ -45,20 +55,13 @@ Optional settings:
 - `end_date` (default: the current date)
 - `enable_click_view_report_stream` (default: `false`)
 
-If using a manager account, `login_customer_id` should be set to the customer ID of the manager account.
- 
-If you provide `customer_ids`, you filter on which customer accounts you want to get data for. The same is true for `customer_id` but for a single customer account. If both are provided, `customer_ids` takes precedence. If neither are provided, all customer accounts available to the authenticated principal are synced. 
+#### `customer_ids`/`customer_id`
+If `customer_ids` is provided, the tap will sync get data for the corrsponding customer accounts only. The same is true for `customer_id` but for a single customer account. If both are provided, `customer_ids` takes precedence. If neither are provided, all customer accounts available to the authenticated principal are synced. 
 
-How to get these settings can be found in the following Google Ads documentation:
+A customer ID should be provided as a string comprising of 10 numeric characters, excluding any dashes (e.g. an ID of `123-456-7890` should be supplied as `1234567890`).
 
-https://developers.google.com/adwords/api/docs/guides/authentication
-
-https://developers.google.com/google-ads/api/docs/first-call/dev-token
-
-If you have installed the tap you can run the following commands to see more information about the tap.
-```bash
-tap-googleads --about
-```
+#### `login_customer_id`
+If authenticated as a manager account, `login_customer_id` should be set to the customer ID of the manager account.
 
 ### Proxy OAuth Credentials
 
