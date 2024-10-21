@@ -1,13 +1,20 @@
 """REST client handling, including GoogleAdsStream base class."""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import cached_property
 from typing import Any, Dict, Optional
 
+import requests
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
+
+
+class ResumableAPIError(Exception):
+    def __init__(self, message: str, response: requests.Response) -> None:
+        super().__init__(message)
+        self.response = response
 
 
 class GoogleAdsStream(RESTStream):
@@ -18,9 +25,6 @@ class GoogleAdsStream(RESTStream):
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
     _LOG_REQUEST_METRIC_URLS: bool = True
-
-    _end_date = datetime.now()
-    _start_date = _end_date - timedelta(days=91)
 
     @cached_property
     def authenticator(self) -> OAuthAuthenticator:
@@ -89,6 +93,12 @@ class GoogleAdsStream(RESTStream):
             params["order_by"] = self.replication_key
         return params
 
+    def get_records(self, context):
+        try:
+            yield from super().get_records(context)
+        except ResumableAPIError as e:
+            self.logger.warning(e)
+
     @property
     def gaql(self):
         raise NotImplementedError
@@ -101,17 +111,11 @@ class GoogleAdsStream(RESTStream):
 
     @cached_property
     def start_date(self):
-        date = self.config.get("start_date")
-        date = datetime.fromisoformat(date) if date else self._start_date
-
-        return date.strftime(r"'%Y-%m-%d'")
+        return datetime.fromisoformat(self.config["start_date"]).strftime(r"'%Y-%m-%d'")
 
     @cached_property
     def end_date(self):
-        date = self.config.get("end_date")
-        date = datetime.fromisoformat(date) if date else self._end_date
-
-        return date.strftime(r"'%Y-%m-%d'")
+        return datetime.fromisoformat(self.config["end_date"]).strftime(r"'%Y-%m-%d'")
 
     @cached_property
     def customer_ids(self):

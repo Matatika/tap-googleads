@@ -1,5 +1,6 @@
 """GoogleAds tap class."""
 
+from datetime import datetime, timedelta, timezone
 from typing import List
 
 from singer_sdk import Stream, Tap
@@ -14,10 +15,10 @@ from tap_googleads.streams import (
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
     CampaignsStream,
+    ClickViewReportStream,
     CustomerHierarchyStream,
     GeoPerformance,
     GeotargetsStream,
-    ClickViewReportStream,
 )
 
 STREAM_TYPES = [
@@ -46,6 +47,8 @@ class TapGoogleAds(Tap):
         required=True,
         secret=True,
     )
+    _end_date = datetime.now(timezone.utc).date()
+    _start_date = _end_date - timedelta(days=90)
 
     # TODO: Add Descriptions
     config_jsonschema = th.PropertiesList(
@@ -107,13 +110,15 @@ class TapGoogleAds(Tap):
         ),
         th.Property(
             "start_date",
-            th.DateTimeType,
-            description="Start date for all of the streams that use date based filtering.",
+            th.DateType,
+            description="ISO start date for all of the streams that use date-based filtering. Defaults to 90 days before the current day.",
+            default=_start_date.isoformat(),
         ),
         th.Property(
             "end_date",
-            th.DateTimeType,
-            description="End date for all of the streams that use date based filtering.",
+            th.DateType,
+            description="ISO end date for all of the streams that use date-based filtering. Defaults to the current day.",
+            default=_end_date.isoformat(),
         ),
         th.Property(
             "enable_click_view_report_stream",
