@@ -119,7 +119,9 @@ class GoogleAdsStream(RESTStream):
 
     @cached_property
     def customer_ids(self):
-        if self.config.get("customer_ids"):
-            return self.config["customer_ids"]
+        customer_ids = self.config.get("customer_ids")
+        if customer_ids is not None:
+            return customer_ids
 
-        return [self.config["customer_id"]] if self.config.get("customer_id") else []
+        customer_id = self.config.get("customer_id")
+        return customer_id and [customer_id]

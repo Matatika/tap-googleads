@@ -108,7 +108,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
         super().validate_response(response)
 
     def generate_child_contexts(self, record, context):
-        customer_ids = self.config.get("customer_ids")
+        customer_ids = self.customer_ids
 
         if customer_ids is None:
             customer = record["customerClient"]
