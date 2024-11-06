@@ -19,7 +19,7 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
                 "client_secret": "1234",
                 "refresh_token": "1234",
             },
-            "customer_id": "1234",
+            "customer_id": "1234567890",
             "developer_token": "1234",
         }
         responses.reset()
