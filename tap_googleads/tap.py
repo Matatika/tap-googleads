@@ -35,6 +35,8 @@ STREAM_TYPES = [
     GeoPerformance,
 ]
 
+CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")
+
 
 class TapGoogleAds(Tap):
     """GoogleAds tap class."""
@@ -93,17 +95,17 @@ class TapGoogleAds(Tap):
         ),
         th.Property(
             "login_customer_id",
-            th.StringType,
+            CUSTOMER_ID_TYPE,
             description="Value to use in the login-customer-id header if using a manager customer account. See https://developers.google.com/search-ads/reporting/concepts/login-customer-id for more info.",
         ),
         th.Property(
             "customer_ids",
-            th.ArrayType(th.StringType),
+            th.ArrayType(CUSTOMER_ID_TYPE),
             description="Get data for the provided customers only, rather than all accessible customers. Takes precedence over `customer_id`.",
         ),
         th.Property(
             "customer_id",
-            th.StringType,
+            CUSTOMER_ID_TYPE,
             description="Get data for the provided customer only, rather than all accessible customers. Superseeded by `customer_ids`.",
         ),
         th.Property(
