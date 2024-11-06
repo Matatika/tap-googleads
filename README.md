@@ -55,10 +55,10 @@ Optional settings:
 - `end_date` (default: the current date)
 - `enable_click_view_report_stream` (default: `false`)
 
+Config for settings that refer to a customer ID should be provided as a string comprising of 10 numeric characters (e.g. `123-456-7890` or `1234567890`).
+
 #### `customer_ids`/`customer_id`
 If `customer_ids` is provided, the tap will sync get data for the corrsponding customer accounts only. The same is true for `customer_id` but for a single customer account. If both are provided, `customer_ids` takes precedence. If neither are provided, all customer accounts available to the authenticated principal are synced. 
-
-A customer ID should be provided as a string comprising of 10 numeric characters, excluding any dashes (e.g. an ID of `123-456-7890` should be supplied as `1234567890`).
 
 #### `login_customer_id`
 If authenticated as a manager account, `login_customer_id` should be set to the customer ID of the manager account.
