@@ -75,7 +75,7 @@ class GoogleAdsStream(RESTStream):
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
         headers["login-customer-id"] = (
-            self.config.get("login_customer_id")
+            self.login_customer_id
             or self.context
             and self.context.get("customer_id")
         )
@@ -120,8 +120,24 @@ class GoogleAdsStream(RESTStream):
     @cached_property
     def customer_ids(self):
         customer_ids = self.config.get("customer_ids")
-        if customer_ids is not None:
-            return customer_ids
-
         customer_id = self.config.get("customer_id")
-        return customer_id and [customer_id]
+
+        if customer_ids is None:
+            if customer_id is None:
+                return
+            customer_ids = [customer_id]
+
+        return list(map(_sanitise_customer_id, customer_ids))
+
+    @cached_property
+    def login_customer_id(self):
+        login_customer_id = self.config.get("login_customer_id")
+
+        if login_customer_id is None:
+            return
+
+        return _sanitise_customer_id(login_customer_id)
+
+
+def _sanitise_customer_id(customer_id: str):
+    return customer_id.replace("-", "")
