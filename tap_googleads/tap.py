@@ -128,6 +128,13 @@ class TapGoogleAds(Tap):
         ),
     ).to_dict()
 
+    def setup_mapper(self):
+        self._config.setdefault("flattening_enabled", True)
+        self._config.setdefault("flattening_max_depth", 2)
+
+        return super().setup_mapper()
+
+        
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""
         if self.config["enable_click_view_report_stream"]:
