@@ -15,20 +15,20 @@ plugins:
     - discover
     settings:
     - name: oauth_credentials.refresh_token
-      kind: password
+      kind: string
       sensitive: true
     - name: oauth_credentials.client_id
     - name: oauth_credentials.client_secret
-      kind: password
+      kind: string
       sensitive: true
     - name: oauth_credentials.refresh_proxy_url
-      kind: hidden
+      kind: string
       hidden: true
     - name: oauth_credentials.refresh_proxy_url_auth
-      kind: hidden
+      kind: string
       hidden: true
     - name: developer_token
-      kind: password
+      kind: string
       sensitive: true
     - name: login_customer_id
     - name: customer_id
