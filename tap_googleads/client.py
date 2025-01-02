@@ -26,6 +26,37 @@ class GoogleAdsStream(RESTStream):
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
     _LOG_REQUEST_METRIC_URLS: bool = True
 
+    def response_error_message(self, response: requests.Response) -> str:
+        """Build error message for invalid http statuses.
+
+        WARNING - Override this method when the URL path may contain secrets or PII
+
+        Args:
+            response: A :class:`requests.Response` object.
+
+        Returns:
+            str: The error message
+        """
+        base_msg = super().response_error_message(response)
+        try:
+            error = response.json()["error"]
+            main_message = (
+                f"Error {error['code']}: {error['message']} ({error['status']})"
+            )
+
+            if "details" in error and error["details"]:
+                detail = error["details"][0]
+                if "errors" in detail and detail["errors"]:
+                    error_detail = detail["errors"][0]
+                    detailed_message = error_detail.get("message", "")
+                    request_id = detail.get("requestId", "")
+
+                    return f"{base_msg}. {main_message}\nDetails: {detailed_message}\nRequest ID: {request_id}"
+
+            return base_msg + main_message
+        except Exception:
+            return base_msg
+
     @cached_property
     def authenticator(self) -> OAuthAuthenticator:
         """Return a new authenticator object."""
