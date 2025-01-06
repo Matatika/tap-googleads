@@ -65,6 +65,15 @@
                             "type": "string"
                         }
                     }
+                },
+                "systemServingStatus": {
+                    "type": "string",
+                    "enum": [
+                        "ELIGIBLE",
+                        "RARELY_SERVED",
+                        "UNKNOWN",
+                        "UNSPECIFIED"
+                    ]
                 }
             }
         },
