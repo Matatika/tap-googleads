@@ -82,6 +82,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
     replication_key = None
     parent_stream_type = AccessibleCustomers
     schema = th.PropertiesList(
+        th.Property("customer_id", th.StringType),
         th.Property(
             "customerClient",
             th.ObjectType(
