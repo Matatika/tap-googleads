@@ -46,6 +46,9 @@
         "geographicView": {
             "type": "object",
             "properties": {
+                "resourceName": {
+                    "type": "string"
+                },
                 "locationType": {
                     "type": "string"
                 },
