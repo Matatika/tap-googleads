@@ -16,7 +16,7 @@ singer-sdk = "0.42.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.4"
-tox = "^4.23.2"
+tox = "^4.24.1"
 flake8 = "^5.0.4"
 black = "^24.8"
 pydocstyle = "^6.1.1"
