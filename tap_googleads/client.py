@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from functools import cached_property
+from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
@@ -56,6 +57,13 @@ class GoogleAdsStream(RESTStream):
             return base_msg + main_message
         except Exception:
             return base_msg
+
+    def validate_response(self, response):
+        if response.status_code == HTTPStatus.FORBIDDEN:
+            msg = self.response_error_message(response)
+            raise ResumableAPIError(msg, response)
+
+        super().validate_response(response)
 
     @cached_property
     def authenticator(self) -> OAuthAuthenticator:
