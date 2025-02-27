@@ -23,6 +23,7 @@ from tap_googleads.streams import (
     PerformanceMaxAssetGroups,
     CampaignConversion,
     ConversionGoals,
+    Conversion,
 )
 
 STREAM_TYPES = [
@@ -41,6 +42,7 @@ STREAM_TYPES = [
     PerformanceMaxAssetGroupHistoricalPerformance,
     CampaignConversion,
     ConversionGoals,
+    Conversion,
 ]
 
 CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")
