@@ -1,0 +1,92 @@
+{
+	"type": "object",
+	"properties": {
+		"customer_id": {
+			"type": "string"
+		},
+		"campaign": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			}
+		},
+		"adGroup": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			}
+		},
+		"searchTermView": {
+			"type": "object",
+			"properties": {
+				"searchTerm": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				}
+			}
+		},
+		"segments": {
+			"type": "object",
+			"properties": {
+				"date": {
+					"type": "string",
+					"format": "date"
+				},
+				"keyword": {
+					"type": "object",
+					"properties": {
+						"info": {
+							"type": "object",
+							"properties": {
+								"matchType": {
+									"type": "string"
+								},
+								"text": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"metrics": {
+			"type": "object",
+			"properties": {
+				"clicks": {
+					"type": "string"
+				},
+				"impressions": {
+					"type": "string"
+				},
+				"ctr": {
+					"type": "number"
+				},
+				"averageCpc": {
+					"type": "number"
+				},
+				"costMicros": {
+					"type": "string"
+				},
+				"conversions": {
+					"type": "number"
+				},
+				"conversionsValue": {
+					"type": "number"
+				}
+			}
+		}
+	}
+}

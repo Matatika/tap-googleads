@@ -1,0 +1,45 @@
+{
+	"type": "object",
+	"properties": {
+		"metrics": {
+			"type": "object",
+			"properties": {
+				"allConversions": {
+					"type": "number"
+				},
+				"allConversions_value": {
+					"type": "number"
+				},
+				"conversions": {
+					"type": "number"
+				},
+				"conversionsValue": {
+					"type": "number"
+				}
+			}
+		},
+		"segments": {
+			"type": "object",
+			"properties": {
+				"date": {
+					"type": "string",
+					"format": "date"
+				},
+				"conversionAction": {
+					"type": "string"
+				}
+			}
+		},
+		"campaign": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"resourceName": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

@@ -481,35 +481,9 @@ class PerformanceMaxAssetGroupHistoricalPerformance(ReportsStream):
     ]
 
     replication_key = None
-
-    schema = th.ObjectType(
-        th.Property("customer_id", th.StringType),
-        th.Property(
-            "campaign",
-            th.ObjectType(
-                th.Property("resourceName", th.StringType),
-                th.Property("id", th.StringType),
-            ),
-        ),
-        th.Property(
-            "metrics",
-            th.ObjectType(
-                th.Property("clicks", th.StringType),
-                th.Property("conversionsValue", th.IntegerType),
-                th.Property("conversions", th.IntegerType),
-                th.Property("costMicros", th.StringType),
-                th.Property("impressions", th.StringType),
-            ),
-        ),
-        th.Property("segments", th.ObjectType(th.Property("date", th.DateType))),
-        th.Property(
-            "assetGroup",
-            th.ObjectType(
-                th.Property("resourceName", th.StringType),
-                th.Property("id", th.StringType),
-            ),
-        ),
-    ).to_dict()
+    schema_filepath = (
+        SCHEMAS_DIR / "performance_max_asset_group_historical_performance.json"
+    )
 
     @property
     def gaql(self):
@@ -539,27 +513,7 @@ class PerformanceMaxAssetGroups(ReportsStream):
     ]
 
     replication_key = None
-
-    schema = th.ObjectType(
-        th.Property("customer_id", th.StringType),
-        th.Property(
-            "assetGroup",
-            th.ObjectType(
-                th.Property("adStrength", th.StringType),
-                th.Property("campaign", th.StringType),
-                th.Property("finalMobileUrls", th.StringType),
-                th.Property("finalUrls", th.ArrayType(th.StringType)),
-                th.Property("id", th.StringType),
-                th.Property("name", th.StringType),
-                th.Property("path1", th.StringType),
-                th.Property("path2", th.StringType),
-                th.Property("primaryStatus", th.StringType),
-                th.Property("primaryStatusReasons", th.ArrayType(th.StringType)),
-                th.Property("resourceName", th.StringType),
-                th.Property("status", th.StringType),
-            ),
-        ),
-    ).to_dict()
+    schema_filepath = SCHEMAS_DIR / "performance_max_asset_groups.json"
 
     @property
     def gaql(self):
@@ -610,27 +564,7 @@ class ConversionGoals(ReportsStream):
         "conversion_action__id",
     ]
     replication_key = None
-
-    schema = th.ObjectType(
-        th.Property(
-            "conversionAction",
-            th.ObjectType(
-                th.Property("status", th.StringType),
-                th.Property("type", th.StringType),
-                th.Property("origin", th.StringType),
-                th.Property("category", th.StringType),
-                th.Property("countingYype", th.StringType),
-                th.Property("id", th.StringType),
-                th.Property("name", th.StringType),
-                th.Property("primaryForGoal", th.BooleanType),
-                th.Property("ownerCustomer", th.StringType),
-                th.Property("includeInConversionsMetric", th.BooleanType),
-                th.Property("clickThroughLookbackWindowDays", th.StringType),
-                th.Property("viewThroughLookbackWindowDays", th.StringType),
-                th.Property("phoneCallDurationSeconds", th.StringType),
-            ),
-        )
-    ).to_dict()
+    schema_filepath = SCHEMAS_DIR / "conversion_goals.json"
 
     def post_process(self, row: Dict, context: Dict | None = None) -> Dict | None:
         return super().post_process(row, context)
@@ -663,32 +597,7 @@ class CampaignConversion(ReportsStream):
         "segments__conversion_action",
     ]
     replication_key = None
-
-    schema = th.ObjectType(
-        th.Property(
-            "metrics",
-            th.ObjectType(
-                th.Property("allConversions", th.NumberType),
-                th.Property("allConversions_value", th.NumberType),
-                th.Property("conversions", th.NumberType),
-                th.Property("conversionsValue", th.NumberType),
-            ),
-        ),
-        th.Property(
-            "segments",
-            th.ObjectType(
-                th.Property("date", th.DateType),
-                th.Property("conversionAction", th.StringType),
-            ),
-        ),
-        th.Property(
-            "campaign",
-            th.ObjectType(
-                th.Property("id", th.StringType),
-                th.Property("resourceName", th.StringType),
-            ),
-        ),
-    ).to_dict()
+    schema_filepath = SCHEMAS_DIR / "campaign_conversion.json"
 
 
 class Conversion(ReportsStream):
@@ -715,3 +624,92 @@ class Conversion(ReportsStream):
     primary_keys = ["conversion_action__id", "segments__date"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "conversion.json"
+
+
+class KeywordPerformance(ReportsStream):
+    """Keyword Performance Stream.
+
+    Retrieves keyword performance data from Google Ads API including
+    information about ad groups, campaigns, and performance metrics.
+    """
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+            campaign.id,
+            campaign.name,
+            ad_group.id,
+            ad_group.name,
+            ad_group_criterion.keyword.text,
+            ad_group_criterion.keyword.match_type,
+            ad_group_criterion.system_serving_status,
+            ad_group_criterion.approval_status,
+            ad_group_criterion.status,
+            ad_group_criterion.quality_info.quality_score,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.ctr,
+            metrics.average_cpc,
+            metrics.cost_micros,
+            metrics.conversions,
+            metrics.conversions_value,
+            segments.date
+        FROM keyword_view
+        WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_keyword_performance"
+    primary_keys = [
+        "campaign__id",
+        "adGroup__id",
+        "adGroupCriterion__keyword__text",
+        "adGroupCriterion__keyword__matchType",
+        "segments__date",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "keyword_performance.json"
+
+
+class SearchQueryPerformance(ReportsStream):
+    """Search Query Performance Stream.
+
+    Retrieves performance data for the actual search queries that triggered
+    ads, showing how user searches relate to your keywords and their performance.
+    """
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+            campaign.id,
+            campaign.name,
+            ad_group.id,
+            ad_group.name,
+            search_term_view.search_term,
+            search_term_view.status,
+            segments.keyword.info.match_type,
+            segments.keyword.info.text,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.ctr,
+            metrics.average_cpc,
+            metrics.cost_micros,
+            metrics.conversions,
+            metrics.conversions_value,
+            segments.date
+        FROM search_term_view
+        WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_search_query_performance"
+    primary_keys = [
+        "campaign__id",
+        "adGroup__id",
+        "searchTermView__searchTerm",
+        "segments__date",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "search_query_performance.json"

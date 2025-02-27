@@ -24,6 +24,8 @@ from tap_googleads.streams import (
     CampaignConversion,
     ConversionGoals,
     Conversion,
+    KeywordPerformance,
+    SearchQueryPerformance,
 )
 
 STREAM_TYPES = [
@@ -43,6 +45,8 @@ STREAM_TYPES = [
     CampaignConversion,
     ConversionGoals,
     Conversion,
+    KeywordPerformance,
+    SearchQueryPerformance,
 ]
 
 CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")
