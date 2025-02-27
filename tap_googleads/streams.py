@@ -579,3 +579,113 @@ class PerformanceMaxAssetGroups(ReportsStream):
         asset_group.status
         FROM asset_group
         """
+
+
+class ConversionGoals(ReportsStream):
+    """Conversion Goals"""
+
+    @property
+    def gaql(self):
+        return f"""
+            SELECT
+                conversion_action.status
+                , conversion_action.type
+                , conversion_action.origin
+                , conversion_action.category
+                , conversion_action.counting_type
+                , conversion_action.id
+                , conversion_action.name
+                , conversion_action.primary_for_goal
+                , conversion_action.owner_customer
+                , conversion_action.include_in_conversions_metric
+                , conversion_action.click_through_lookback_window_days
+                , conversion_action.view_through_lookback_window_days
+                , conversion_action.phone_call_duration_seconds
+            FROM conversion_action
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "conversion_goals"
+    primary_keys = [
+        "conversion_action__id",
+    ]
+    replication_key = None
+
+    schema = th.ObjectType(
+        th.Property(
+            "conversionAction",
+            th.ObjectType(
+                th.Property("status", th.StringType),
+                th.Property("type", th.StringType),
+                th.Property("origin", th.StringType),
+                th.Property("category", th.StringType),
+                th.Property("countingYype", th.StringType),
+                th.Property("id", th.StringType),
+                th.Property("name", th.StringType),
+                th.Property("primaryForGoal", th.BooleanType),
+                th.Property("ownerCustomer", th.StringType),
+                th.Property("includeInConversionsMetric", th.BooleanType),
+                th.Property("clickThroughLookbackWindowDays", th.StringType),
+                th.Property("viewThroughLookbackWindowDays", th.StringType),
+                th.Property("phoneCallDurationSeconds", th.StringType),
+            ),
+        )
+    ).to_dict()
+
+    def post_process(self, row: Dict, context: Dict | None = None) -> Dict | None:
+        return super().post_process(row, context)
+
+
+class CampaignConversion(ReportsStream):
+    """Campaign Conversion"""
+
+    @property
+    def gaql(self):
+        return f"""
+
+        SELECT
+            campaign.id,
+            segments.conversion_action,
+            segments.date,
+            metrics.all_conversions,
+            metrics.all_conversions_value,
+            metrics.conversions,
+            metrics.conversions_value
+        FROM campaign
+        WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+    """
+
+    records_jsonpath = "$.results[*]"
+    name = "campaign_conversion"
+    primary_keys = [
+        "campaign__id",
+        "segments__date",
+        "segments__conversion_action",
+    ]
+    replication_key = None
+
+    schema = th.ObjectType(
+        th.Property(
+            "metrics",
+            th.ObjectType(
+                th.Property("allConversions", th.NumberType),
+                th.Property("allConversions_value", th.NumberType),
+                th.Property("conversions", th.NumberType),
+                th.Property("conversionsValue", th.NumberType),
+            ),
+        ),
+        th.Property(
+            "segments",
+            th.ObjectType(
+                th.Property("date", th.DateType),
+                th.Property("conversionAction", th.StringType),
+            ),
+        ),
+        th.Property(
+            "campaign",
+            th.ObjectType(
+                th.Property("id", th.StringType),
+                th.Property("resourceName", th.StringType),
+            ),
+        ),
+    ).to_dict()
