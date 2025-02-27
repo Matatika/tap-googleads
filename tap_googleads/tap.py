@@ -21,7 +21,7 @@ from tap_googleads.streams import (
     GeotargetsStream,
     PerformanceMaxAssetGroupHistoricalPerformance,
     PerformanceMaxAssetGroups,
-    CampaignConversions,
+    CampaignConversion,
     ConversionGoals,
 )
 
@@ -39,7 +39,7 @@ STREAM_TYPES = [
     GeoPerformance,
     PerformanceMaxAssetGroups,
     PerformanceMaxAssetGroupHistoricalPerformance,
-    CampaignConversions,
+    CampaignConversion,
     ConversionGoals,
 ]
 
