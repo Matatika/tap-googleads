@@ -140,11 +140,12 @@ class CustomerHierarchyStream(GoogleAdsStream):
 class ReportsStream(GoogleAdsStream):
     parent_stream_type = CustomerHierarchyStream
 
+
 class GeotargetsStream(ReportsStream):
     """Geotargets, worldwide, constant across all customers"""
 
     gaql = """
-    SELECT 
+    SELECT
         geo_target_constant.canonical_name,
         geo_target_constant.country_code,
         geo_target_constant.id,
@@ -246,7 +247,7 @@ class ClickViewReportStream(ReportsStream):
     def request_records(self, context):
         start_value = self.get_starting_replication_key_value(context)
 
-        start_date =  datetime.date.fromisoformat(start_value)
+        start_date = datetime.date.fromisoformat(start_value)
         end_date = datetime.date.fromisoformat(self.config["end_date"])
 
         delta = end_date - start_date
@@ -256,7 +257,9 @@ class ClickViewReportStream(ReportsStream):
             records = list(super().request_records(context))
 
             if not records:
-                self._increment_stream_state({"date": self.date.isoformat()}, context=self.context)
+                self._increment_stream_state(
+                    {"date": self.date.isoformat()}, context=self.context
+                )
 
             yield from records
 
@@ -294,9 +297,9 @@ class AdGroupsStream(ReportsStream):
     @property
     def gaql(self):
         return """
-       SELECT ad_group.url_custom_parameters, 
-       ad_group.type, 
-       ad_group.tracking_url_template, 
+       SELECT ad_group.url_custom_parameters,
+       ad_group.type,
+       ad_group.tracking_url_template,
        ad_group.targeting_setting.target_restrictions,
        ad_group.target_roas,
        ad_group.target_cpm_micros,
@@ -320,7 +323,7 @@ class AdGroupsStream(ReportsStream):
        ad_group.campaign,
        ad_group.base_ad_group,
        ad_group.ad_rotation_mode
-       FROM ad_group 
+       FROM ad_group
        """
 
     records_jsonpath = "$.results[*]"
@@ -440,18 +443,18 @@ class GeoPerformance(ReportsStream):
     @property
     def gaql(self):
         return f"""
-    SELECT 
-        campaign.name, 
-        campaign.status, 
-        segments.date, 
-        metrics.clicks, 
+    SELECT
+        campaign.name,
+        campaign.status,
+        segments.date,
+        metrics.clicks,
         metrics.cost_micros,
-        metrics.impressions, 
+        metrics.impressions,
         metrics.conversions,
         geographic_view.location_type,
         geographic_view.country_criterion_id
-    FROM geographic_view 
-    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date} 
+    FROM geographic_view
+    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
     """
 
     records_jsonpath = "$.results[*]"
@@ -464,3 +467,115 @@ class GeoPerformance(ReportsStream):
     ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_performance.json"
+
+
+class PerformanceMaxAssetGroupHistoricalPerformance(ReportsStream):
+    """Geo performance"""
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_performance_max_asset_group_historical_performance"
+    primary_keys = [
+        "campaign__id",
+        "asset_group__id",
+        "segments__date",
+    ]
+
+    replication_key = None
+
+    schema = th.ObjectType(
+        th.Property("customer_id", th.StringType),
+        th.Property(
+            "campaign",
+            th.ObjectType(
+                th.Property("resourceName", th.StringType),
+                th.Property("id", th.StringType),
+            ),
+        ),
+        th.Property(
+            "metrics",
+            th.ObjectType(
+                th.Property("clicks", th.StringType),
+                th.Property("conversionsValue", th.IntegerType),
+                th.Property("conversions", th.IntegerType),
+                th.Property("costMicros", th.StringType),
+                th.Property("impressions", th.StringType),
+            ),
+        ),
+        th.Property("segments", th.ObjectType(th.Property("date", th.DateType))),
+        th.Property(
+            "assetGroup",
+            th.ObjectType(
+                th.Property("resourceName", th.StringType),
+                th.Property("id", th.StringType),
+            ),
+        ),
+    ).to_dict()
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+        campaign.id,
+        campaign.resource_name,
+        segments.date,
+        asset_group.id,
+        metrics.conversions,
+        metrics.conversions_value,
+        metrics.cost_micros,
+        metrics.clicks,
+        metrics.impressions
+        FROM asset_group
+        where segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+
+class PerformanceMaxAssetGroups(ReportsStream):
+    """Asset Groups dimension"""
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_performance_max_asset_groups"
+    primary_keys = [
+        "asset_group__id",
+    ]
+
+    replication_key = None
+
+    schema = th.ObjectType(
+        th.Property("customer_id", th.StringType),
+        th.Property(
+            "assetGroup",
+            th.ObjectType(
+                th.Property("adStrength", th.StringType),
+                th.Property("campaign", th.StringType),
+                th.Property("finalMobileUrls", th.StringType),
+                th.Property("finalUrls", th.ArrayType(th.StringType)),
+                th.Property("id", th.StringType),
+                th.Property("name", th.StringType),
+                th.Property("path1", th.StringType),
+                th.Property("path2", th.StringType),
+                th.Property("primaryStatus", th.StringType),
+                th.Property("primaryStatusReasons", th.ArrayType(th.StringType)),
+                th.Property("resourceName", th.StringType),
+                th.Property("status", th.StringType),
+            ),
+        ),
+    ).to_dict()
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+        asset_group.ad_strength,
+        asset_group.campaign,
+        asset_group.final_mobile_urls,
+        asset_group.final_urls,
+        asset_group.id,
+        asset_group.name,
+        asset_group.path1,
+        asset_group.path2,
+        asset_group.primary_status,
+        asset_group.primary_status_reasons,
+        asset_group.resource_name,
+        asset_group.status
+        FROM asset_group
+        """
