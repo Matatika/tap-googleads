@@ -600,32 +600,6 @@ class CampaignConversion(ReportsStream):
     schema_filepath = SCHEMAS_DIR / "campaign_conversion.json"
 
 
-class Conversion(ReportsStream):
-    """Conversion"""
-
-    @property
-    def gaql(self):
-        return f"""
-    SELECT
-        segments.date,
-        conversion_action.id,
-        conversion_action.name,
-        conversion_action.category,
-        conversion_action.origin,
-        conversion_action.owner_customer,
-        metrics.all_conversions,
-        metrics.all_conversions_value
-    FROM conversion_action
-    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
-    """
-
-    records_jsonpath = "$.results[*]"
-    name = "stream_conversion"
-    primary_keys = ["conversion_action__id", "segments__date"]
-    replication_key = None
-    schema_filepath = SCHEMAS_DIR / "conversion.json"
-
-
 class KeywordPerformance(ReportsStream):
     """Keyword Performance Stream.
 

@@ -23,7 +23,6 @@ from tap_googleads.streams import (
     PerformanceMaxAssetGroups,
     CampaignConversion,
     ConversionGoals,
-    Conversion,
     KeywordPerformance,
     SearchQueryPerformance,
 )
@@ -44,7 +43,6 @@ STREAM_TYPES = [
     PerformanceMaxAssetGroupHistoricalPerformance,
     CampaignConversion,
     ConversionGoals,
-    Conversion,
     KeywordPerformance,
     SearchQueryPerformance,
 ]
