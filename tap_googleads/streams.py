@@ -605,7 +605,7 @@ class ConversionGoals(ReportsStream):
         """
 
     records_jsonpath = "$.results[*]"
-    name = "conversion_goals"
+    name = "stream_conversion_goals"
     primary_keys = [
         "conversion_action__id",
     ]
@@ -656,7 +656,7 @@ class CampaignConversion(ReportsStream):
     """
 
     records_jsonpath = "$.results[*]"
-    name = "campaign_conversion"
+    name = "stream_campaign_conversion"
     primary_keys = [
         "campaign__id",
         "segments__date",

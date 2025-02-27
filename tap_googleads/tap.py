@@ -19,6 +19,10 @@ from tap_googleads.streams import (
     CustomerHierarchyStream,
     GeoPerformance,
     GeotargetsStream,
+    PerformanceMaxAssetGroupHistoricalPerformance,
+    PerformanceMaxAssetGroups,
+    CampaignConversions,
+    ConversionGoals,
 )
 
 STREAM_TYPES = [
@@ -33,6 +37,10 @@ STREAM_TYPES = [
     CampaignPerformanceByLocation,
     GeotargetsStream,
     GeoPerformance,
+    PerformanceMaxAssetGroups,
+    PerformanceMaxAssetGroupHistoricalPerformance,
+    CampaignConversions,
+    ConversionGoals,
 ]
 
 CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")
@@ -134,7 +142,6 @@ class TapGoogleAds(Tap):
 
         return super().setup_mapper()
 
-        
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""
         if self.config["enable_click_view_report_stream"]:
