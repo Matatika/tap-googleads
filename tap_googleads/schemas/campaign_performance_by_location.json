@@ -32,6 +32,12 @@
                 },
                 "impressions": {
                     "type": "string"
+                },
+                "allConversions": {
+                    "type": "number"
+                },
+                "conversions": {
+                    "type": "number"
                 }
             }
         },
