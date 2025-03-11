@@ -46,9 +46,6 @@
                     "properties": {
                         "geoTargetConstant": {
                             "type": "string"
-                        },
-                        "bidModifier": {
-                            "type": "number"
                         }
                     }
                 }
