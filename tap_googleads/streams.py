@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import datetime
-from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Iterable
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
-from tap_googleads.client import GoogleAdsStream, ResumableAPIError
+from tap_googleads.client import GoogleAdsStream
 
 if TYPE_CHECKING:
     from singer_sdk.helpers.types import Context, Record
@@ -100,13 +99,6 @@ class CustomerHierarchyStream(GoogleAdsStream):
     ).to_dict()
 
     seen_customer_ids = set()
-
-    def validate_response(self, response):
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            msg = self.response_error_message(response)
-            raise ResumableAPIError(msg, response)
-
-        super().validate_response(response)
 
     def generate_child_contexts(self, record, context):
         customer_ids = self.customer_ids
@@ -262,17 +254,6 @@ class ClickViewReportStream(ReportsStream):
                 )
 
             yield from records
-
-    def validate_response(self, response):
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            error = response.json()["error"]["details"][0]["errors"][0]
-            msg = (
-                "Click view report not accessible to customer "
-                f"'{self.context['customer_id']}': {error['message']}"
-            )
-            raise ResumableAPIError(msg, response)
-
-        super().validate_response(response)
 
 
 class CampaignsStream(ReportsStream):
