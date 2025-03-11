@@ -1,11 +1,14 @@
 """REST client handling, including GoogleAdsStream base class."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from functools import cached_property
 from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
+from humps import decamelize
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
@@ -140,7 +143,19 @@ class GoogleAdsStream(RESTStream):
 
     @property
     def gaql(self):
-        raise NotImplementedError
+        def to_attributes(properties: dict[str, dict], parent_attr: str = None):
+            for k in properties:
+                if k in self.context:
+                    continue  # ignore if context key, most likely `customer_id`
+
+                attr = decamelize(".".join((parent_attr, k)) if parent_attr else k)
+
+                if nested_properties := properties[k].get("properties"):
+                    yield from to_attributes(nested_properties, attr)
+                else:
+                    yield attr
+
+        return "SELECT " + ", ".join(to_attributes(self.schema["properties"]))
 
     @property
     def path(self) -> str:
