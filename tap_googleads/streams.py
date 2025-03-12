@@ -132,11 +132,12 @@ class CustomerHierarchyStream(GoogleAdsStream):
 class ReportsStream(GoogleAdsStream):
     parent_stream_type = CustomerHierarchyStream
 
+
 class GeotargetsStream(ReportsStream):
     """Geotargets, worldwide, constant across all customers"""
 
     gaql = """
-    SELECT 
+    SELECT
         geo_target_constant.canonical_name,
         geo_target_constant.country_code,
         geo_target_constant.id,
@@ -238,7 +239,7 @@ class ClickViewReportStream(ReportsStream):
     def request_records(self, context):
         start_value = self.get_starting_replication_key_value(context)
 
-        start_date =  datetime.date.fromisoformat(start_value)
+        start_date = datetime.date.fromisoformat(start_value)
         end_date = datetime.date.fromisoformat(self.config["end_date"])
 
         delta = end_date - start_date
@@ -248,7 +249,9 @@ class ClickViewReportStream(ReportsStream):
             records = list(super().request_records(context))
 
             if not records:
-                self._increment_stream_state({"date": self.date.isoformat()}, context=self.context)
+                self._increment_stream_state(
+                    {"date": self.date.isoformat()}, context=self.context
+                )
 
             yield from records
 
@@ -275,9 +278,9 @@ class AdGroupsStream(ReportsStream):
     @property
     def gaql(self):
         return """
-       SELECT ad_group.url_custom_parameters, 
-       ad_group.type, 
-       ad_group.tracking_url_template, 
+       SELECT ad_group.url_custom_parameters,
+       ad_group.type,
+       ad_group.tracking_url_template,
        ad_group.targeting_setting.target_restrictions,
        ad_group.target_roas,
        ad_group.target_cpm_micros,
@@ -301,7 +304,7 @@ class AdGroupsStream(ReportsStream):
        ad_group.campaign,
        ad_group.base_ad_group,
        ad_group.ad_rotation_mode
-       FROM ad_group 
+       FROM ad_group
        """
 
     records_jsonpath = "$.results[*]"
@@ -336,7 +339,7 @@ class CampaignPerformance(ReportsStream):
     @property
     def gaql(self):
         return f"""
-    SELECT campaign.name, campaign.status, segments.device, segments.date, metrics.impressions, metrics.clicks, metrics.ctr, metrics.average_cpc, metrics.cost_micros FROM campaign WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+    SELECT campaign.name, campaign.status, segments.device, segments.date, metrics.impressions, metrics.clicks, metrics.ctr, metrics.average_cpc, metrics.cost_micros, metrics.all_conversions, metrics.conversions FROM campaign WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
     """
 
     records_jsonpath = "$.results[*]"
@@ -357,7 +360,7 @@ class CampaignPerformanceByAgeRangeAndDevice(ReportsStream):
     @property
     def gaql(self):
         return f"""
-    SELECT ad_group_criterion.age_range.type, campaign.name, campaign.status, ad_group.name, segments.date, segments.device, ad_group_criterion.system_serving_status, ad_group_criterion.bid_modifier, metrics.clicks, metrics.impressions, metrics.ctr, metrics.average_cpc, metrics.cost_micros, campaign.advertising_channel_type FROM age_range_view WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+    SELECT ad_group_criterion.age_range.type, campaign.name, campaign.status, ad_group.name, segments.date, segments.device, ad_group_criterion.system_serving_status, ad_group_criterion.bid_modifier, metrics.clicks, metrics.impressions, metrics.ctr, metrics.average_cpc, metrics.cost_micros, campaign.advertising_channel_type, metrics.all_conversions, metrics.conversions FROM age_range_view WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
     """
 
     records_jsonpath = "$.results[*]"
@@ -379,7 +382,7 @@ class CampaignPerformanceByGenderAndDevice(ReportsStream):
     @property
     def gaql(self):
         return f"""
-    SELECT ad_group_criterion.gender.type, campaign.name, campaign.status, ad_group.name, segments.date, segments.device, ad_group_criterion.system_serving_status, ad_group_criterion.bid_modifier, metrics.clicks, metrics.impressions, metrics.ctr, metrics.average_cpc, metrics.cost_micros, campaign.advertising_channel_type FROM gender_view WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+    SELECT ad_group_criterion.gender.type, campaign.name, campaign.status, ad_group.name, segments.date, segments.device, ad_group_criterion.system_serving_status, ad_group_criterion.bid_modifier, metrics.clicks, metrics.impressions, metrics.ctr, metrics.average_cpc, metrics.cost_micros, campaign.advertising_channel_type, metrics.all_conversions, metrics.conversions FROM gender_view WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
     """
 
     records_jsonpath = "$.results[*]"
@@ -401,7 +404,7 @@ class CampaignPerformanceByLocation(ReportsStream):
     @property
     def gaql(self):
         return f"""
-    SELECT campaign_criterion.location.geo_target_constant, campaign.name, campaign_criterion.bid_modifier, segments.date, metrics.clicks, metrics.impressions, metrics.ctr, metrics.average_cpc, metrics.cost_micros FROM location_view WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date} AND campaign_criterion.status != 'REMOVED'
+    SELECT campaign_criterion.location.geo_target_constant, campaign.name, campaign_criterion.bid_modifier, segments.date, metrics.clicks, metrics.impressions, metrics.ctr, metrics.average_cpc, metrics.cost_micros, metrics.all_conversions, metrics.conversions FROM location_view WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date} AND campaign_criterion.status != 'REMOVED'
     """
 
     records_jsonpath = "$.results[*]"
@@ -421,18 +424,18 @@ class GeoPerformance(ReportsStream):
     @property
     def gaql(self):
         return f"""
-    SELECT 
-        campaign.name, 
-        campaign.status, 
-        segments.date, 
-        metrics.clicks, 
+    SELECT
+        campaign.name,
+        campaign.status,
+        segments.date,
+        metrics.clicks,
         metrics.cost_micros,
-        metrics.impressions, 
+        metrics.impressions,
         metrics.conversions,
         geographic_view.location_type,
         geographic_view.country_criterion_id
-    FROM geographic_view 
-    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date} 
+    FROM geographic_view
+    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
     """
 
     records_jsonpath = "$.results[*]"
@@ -445,3 +448,223 @@ class GeoPerformance(ReportsStream):
     ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_performance.json"
+
+
+class PerformanceMaxAssetGroupHistoricalPerformance(ReportsStream):
+    """Geo performance"""
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_performance_max_asset_group_historical_performance"
+    primary_keys = [
+        "campaign__id",
+        "asset_group__id",
+        "segments__date",
+    ]
+
+    replication_key = None
+    schema_filepath = (
+        SCHEMAS_DIR / "performance_max_asset_group_historical_performance.json"
+    )
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+        campaign.id,
+        campaign.resource_name,
+        segments.date,
+        asset_group.id,
+        metrics.conversions,
+        metrics.conversions_value,
+        metrics.cost_micros,
+        metrics.clicks,
+        metrics.impressions
+        FROM asset_group
+        where segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+
+class PerformanceMaxAssetGroups(ReportsStream):
+    """Asset Groups dimension"""
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_performance_max_asset_groups"
+    primary_keys = [
+        "asset_group__id",
+    ]
+
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "performance_max_asset_groups.json"
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+        asset_group.ad_strength,
+        asset_group.campaign,
+        asset_group.final_mobile_urls,
+        asset_group.final_urls,
+        asset_group.id,
+        asset_group.name,
+        asset_group.path1,
+        asset_group.path2,
+        asset_group.primary_status,
+        asset_group.primary_status_reasons,
+        asset_group.resource_name,
+        asset_group.status
+        FROM asset_group
+        """
+
+
+class ConversionGoals(ReportsStream):
+    """Conversion Goals"""
+
+    @property
+    def gaql(self):
+        return f"""
+            SELECT
+                conversion_action.status
+                , conversion_action.type
+                , conversion_action.origin
+                , conversion_action.category
+                , conversion_action.counting_type
+                , conversion_action.id
+                , conversion_action.name
+                , conversion_action.primary_for_goal
+                , conversion_action.owner_customer
+                , conversion_action.include_in_conversions_metric
+                , conversion_action.click_through_lookback_window_days
+                , conversion_action.view_through_lookback_window_days
+                , conversion_action.phone_call_duration_seconds
+            FROM conversion_action
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_conversion_goals"
+    primary_keys = [
+        "conversion_action__id",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "conversion_goals.json"
+
+    def post_process(self, row: Dict, context: Dict | None = None) -> Dict | None:
+        return super().post_process(row, context)
+
+
+class CampaignConversion(ReportsStream):
+    """Campaign Conversion"""
+
+    @property
+    def gaql(self):
+        return f"""
+
+        SELECT
+            campaign.id,
+            segments.conversion_action,
+            segments.date,
+            metrics.all_conversions,
+            metrics.all_conversions_value,
+            metrics.conversions,
+            metrics.conversions_value
+        FROM campaign
+        WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+    """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_campaign_conversion"
+    primary_keys = [
+        "campaign__id",
+        "segments__date",
+        "segments__conversion_action",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "campaign_conversion.json"
+
+
+class KeywordPerformance(ReportsStream):
+    """Keyword Performance Stream.
+
+    Retrieves keyword performance data from Google Ads API including
+    information about ad groups, campaigns, and performance metrics.
+    """
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+            campaign.id,
+            campaign.name,
+            ad_group.id,
+            ad_group.name,
+            ad_group_criterion.keyword.text,
+            ad_group_criterion.keyword.match_type,
+            ad_group_criterion.system_serving_status,
+            ad_group_criterion.approval_status,
+            ad_group_criterion.status,
+            ad_group_criterion.quality_info.quality_score,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.ctr,
+            metrics.average_cpc,
+            metrics.cost_micros,
+            metrics.conversions,
+            metrics.conversions_value,
+            segments.date
+        FROM keyword_view
+        WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_keyword_performance"
+    primary_keys = [
+        "campaign__id",
+        "adGroup__id",
+        "adGroupCriterion__keyword__text",
+        "adGroupCriterion__keyword__matchType",
+        "segments__date",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "keyword_performance.json"
+
+
+class SearchQueryPerformance(ReportsStream):
+    """Search Query Performance Stream.
+
+    Retrieves performance data for the actual search queries that triggered
+    ads, showing how user searches relate to your keywords and their performance.
+    """
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+            campaign.id,
+            campaign.name,
+            ad_group.id,
+            ad_group.name,
+            search_term_view.search_term,
+            search_term_view.status,
+            segments.keyword.info.match_type,
+            segments.keyword.info.text,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.ctr,
+            metrics.average_cpc,
+            metrics.cost_micros,
+            metrics.conversions,
+            metrics.conversions_value,
+            segments.date
+        FROM search_term_view
+        WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_search_query_performance"
+    primary_keys = [
+        "campaign__id",
+        "adGroup__id",
+        "searchTermView__searchTerm",
+        "segments__date",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "search_query_performance.json"
