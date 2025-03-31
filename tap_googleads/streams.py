@@ -407,7 +407,7 @@ class CampaignPerformanceByLocation(ReportsStream):
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_location"
     primary_keys = [
-        "campaignCriterion__location__geoTargetConstant",
+        "locationView_resourceName",
         "campaign__name",
         "segments__date",
     ]
