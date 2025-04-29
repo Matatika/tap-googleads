@@ -1,0 +1,55 @@
+{
+	"type": "object",
+	"properties": {
+		"customer_id": {
+			"type": "string"
+		},
+		"assetGroup": {
+			"type": "object",
+			"properties": {
+				"adStrength": {
+					"type": "string"
+				},
+				"campaign": {
+					"type": "string"
+				},
+				"finalMobileUrls": {
+					"type": "string"
+				},
+				"finalUrls": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"id": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path1": {
+					"type": "string"
+				},
+				"path2": {
+					"type": "string"
+				},
+				"primaryStatus": {
+					"type": "string"
+				},
+				"primaryStatusReasons": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"resourceName": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

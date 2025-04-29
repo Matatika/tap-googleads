@@ -1,0 +1,49 @@
+{
+	"type": "object",
+	"properties": {
+		"conversionAction": {
+			"type": "object",
+			"properties": {
+				"status": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"origin": {
+					"type": "string"
+				},
+				"category": {
+					"type": "string"
+				},
+				"countingYype": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"primaryForGoal": {
+					"type": "boolean"
+				},
+				"ownerCustomer": {
+					"type": "string"
+				},
+				"includeInConversionsMetric": {
+					"type": "boolean"
+				},
+				"clickThroughLookbackWindowDays": {
+					"type": "string"
+				},
+				"viewThroughLookbackWindowDays": {
+					"type": "string"
+				},
+				"phoneCallDurationSeconds": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}
