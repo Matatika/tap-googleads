@@ -126,6 +126,19 @@ class TapGoogleAds(Tap):
             description="Enables the tap's ClickViewReportStream. This requires setting up / permission on your google ads account(s)",
             default=False,
         ),
+        th.Property(
+            "custom_queries",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("name", th.StringType, description="The name to assign to the query stream."),
+                    th.Property(
+                        "query", th.StringType,
+                        description='A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to <a href="https://developers.google.com/google-ads/api/fields/v19/overview_query_builder">Google\'s documentation</a>.'),
+                )
+            ),
+            description="A list of custom queries to run. Each query will be assigned a stream with the name specified in the `name` field.",
+            default=[],
+        )
     ).to_dict()
 
     def setup_mapper(self):
@@ -134,7 +147,6 @@ class TapGoogleAds(Tap):
 
         return super().setup_mapper()
 
-        
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""
         if self.config["enable_click_view_report_stream"]:
