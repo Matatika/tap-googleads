@@ -6,33 +6,55 @@ from typing import List
 from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-from tap_googleads.streams import (
-    AccessibleCustomers,
+from tap_googleads.custom_query_stream import CustomQueryStream
+from tap_googleads.dynamic_streams import (
+    AdGroupAdLabelStream,
+    AdGroupAdStream,
+    AdGroupCriterionStream,
+    AdGroupLabelStream,
     AdGroupsPerformance,
     AdGroupsStream,
+    AdListingGroupCriterionStream,
+    AudienceStream,
+    CampaignBudgetStream,
+    CampaignCriterionStream,
+    CampaignLabelStream,
     CampaignPerformance,
     CampaignPerformanceByAgeRangeAndDevice,
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
     CampaignsStream,
     ClickViewReportStream,
-    CustomerHierarchyStream,
+    CustomerLabelStream,
     GeoPerformance,
     GeotargetsStream,
+    UserInterestStream,
 )
+from tap_googleads.streams import AccessibleCustomers, CustomerHierarchyStream
 
 STREAM_TYPES = [
     CampaignsStream,
     AdGroupsStream,
     AdGroupsPerformance,
+    AdGroupAdStream,
+    AdGroupCriterionStream,
+    AdGroupLabelStream,
+    AdListingGroupCriterionStream,
     AccessibleCustomers,
     CustomerHierarchyStream,
+    CustomerLabelStream,
     CampaignPerformance,
     CampaignPerformanceByAgeRangeAndDevice,
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
     GeotargetsStream,
     GeoPerformance,
+    AdGroupAdLabelStream,
+    AudienceStream,
+    UserInterestStream,
+    CampaignCriterionStream,
+    CampaignBudgetStream,
+    CampaignLabelStream,
 ]
 
 CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")
@@ -149,6 +171,9 @@ class TapGoogleAds(Tap):
 
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""
+        streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         if self.config["enable_click_view_report_stream"]:
-            STREAM_TYPES.append(ClickViewReportStream)
-        return [stream_class(tap=self) for stream_class in STREAM_TYPES]
+            streams.append(ClickViewReportStream(tap=self))
+        streams.extend(CustomQueryStream(tap=self, custom_query=q) for q in self.config["custom_queries"])
+
+        return streams
