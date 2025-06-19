@@ -6,6 +6,7 @@ from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
+
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
