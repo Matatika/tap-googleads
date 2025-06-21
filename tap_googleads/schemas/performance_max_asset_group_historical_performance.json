@@ -1,0 +1,59 @@
+{
+	"type": "object",
+	"properties": {
+		"customer_id": {
+			"type": "string"
+		},
+		"campaign": {
+			"type": "object",
+			"properties": {
+				"resourceName": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				}
+			}
+		},
+		"metrics": {
+			"type": "object",
+			"properties": {
+				"clicks": {
+					"type": "string"
+				},
+				"conversionsValue": {
+					"type": "integer"
+				},
+				"conversions": {
+					"type": "integer"
+				},
+				"costMicros": {
+					"type": "string"
+				},
+				"impressions": {
+					"type": "string"
+				}
+			}
+		},
+		"segments": {
+			"type": "object",
+			"properties": {
+				"date": {
+					"type": "string",
+					"format": "date"
+				}
+			}
+		},
+		"assetGroup": {
+			"type": "object",
+			"properties": {
+				"resourceName": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}
