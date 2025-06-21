@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import datetime
+from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Iterable
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
-from tap_googleads.client import GoogleAdsStream
+from tap_googleads.client import GoogleAdsStream, ResumableAPIError
 
 if TYPE_CHECKING:
     from singer_sdk.helpers.types import Context, Record
@@ -82,6 +83,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
     parent_stream_type = AccessibleCustomers
     schema = th.PropertiesList(
         th.Property("customer_id", th.StringType),
+        th.Property("parent_customer_id", th.StringType),
         th.Property(
             "customerClient",
             th.ObjectType(
@@ -99,6 +101,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
     ).to_dict()
 
     seen_customer_ids = set()
+
+    def validate_response(self, response):
+        if response.status_code == HTTPStatus.FORBIDDEN:
+            msg = self.response_error_message(response)
+            raise ResumableAPIError(msg, response)
+
+        super().validate_response(response)
 
     def generate_child_contexts(self, record, context):
         customer_ids = self.customer_ids
@@ -124,7 +133,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
         # sync only customers we haven't seen
         customer_ids = set(customer_ids) - self.seen_customer_ids
-        yield from ({"customer_id": customer_id} for customer_id in customer_ids)
+
+        for customer_id in customer_ids:
+            customer_context = {"customer_id": customer_id}
+            # Add parent manager account id if this is a child   
+            if customer_id != context['customer_id']:
+                customer_context['parent_customer_id'] = context['customer_id']
+            yield customer_context
 
         self.seen_customer_ids.update(customer_ids)
 
@@ -251,6 +266,17 @@ class ClickViewReportStream(ReportsStream):
                 self._increment_stream_state({"date": self.date.isoformat()}, context=self.context)
 
             yield from records
+
+    def validate_response(self, response):
+        if response.status_code == HTTPStatus.FORBIDDEN:
+            error = response.json()["error"]["details"][0]["errors"][0]
+            msg = (
+                "Click view report not accessible to customer "
+                f"'{self.context['customer_id']}': {error['message']}"
+            )
+            raise ResumableAPIError(msg, response)
+
+        super().validate_response(response)
 
 
 class CampaignsStream(ReportsStream):

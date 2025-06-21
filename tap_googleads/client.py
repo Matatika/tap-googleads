@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from functools import cached_property
-from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
@@ -58,13 +57,6 @@ class GoogleAdsStream(RESTStream):
         except Exception:
             return base_msg
 
-    def validate_response(self, response):
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            msg = self.response_error_message(response)
-            raise ResumableAPIError(msg, response)
-
-        super().validate_response(response)
-
     @cached_property
     def authenticator(self) -> OAuthAuthenticator:
         """Return a new authenticator object."""
@@ -106,6 +98,13 @@ class GoogleAdsStream(RESTStream):
             auth_headers=auth_headers,
         )
 
+    def _get_login_customer_id(self, context):
+        if self.login_customer_id:
+            return self.login_customer_id
+        if context:
+            return context.get("parent_customer_id") or context.get("customer_id")
+        return None
+
     @property
     def http_headers(self) -> dict:
         """Return the http headers needed."""
@@ -113,11 +112,7 @@ class GoogleAdsStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
-        headers["login-customer-id"] = (
-            self.login_customer_id
-            or self.context
-            and self.context.get("customer_id")
-        )
+        headers["login-customer-id"] = self._get_login_customer_id(self.context)
         return headers
 
     def get_url_params(
