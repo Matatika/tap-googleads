@@ -27,6 +27,7 @@ class CustomQueryStream(DynamicQueryStream):
         self._custom_query = kwargs.pop("custom_query")
         self._gaql = self._custom_query['query']
         self.name = self._custom_query['name']
+        self.add_date_filter_to_query = self._custom_query['add_date_filter_to_query']
         super().__init__(*args, **kwargs)
 
     @property
