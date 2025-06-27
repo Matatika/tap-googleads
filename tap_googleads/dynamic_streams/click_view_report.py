@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from tap_googleads.client import ResumableAPIError
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
@@ -16,7 +16,22 @@ if TYPE_CHECKING:
 class ClickViewReportStream(DynamicQueryStream):
     """Stream for click view reports."""
     
-    date: datetime.date
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize the stream."""
+        super().__init__(*args, **kwargs)
+        self._date: Optional[datetime.date] = None
+    
+    @property
+    def date(self) -> datetime.date:
+        """Get current date property."""
+        if self._date is None:
+            raise ValueError("Date has not been initialized")
+        return self._date
+    
+    @date.setter
+    def date(self, value: datetime.date) -> None:
+        """Set the date property."""
+        self._date = value
 
     @property
     def gaql(self):
@@ -109,4 +124,4 @@ class ClickViewReportStream(DynamicQueryStream):
             )
             raise ResumableAPIError(msg, response)
 
-        super().validate_response(response) 
+        super().validate_response(response)
