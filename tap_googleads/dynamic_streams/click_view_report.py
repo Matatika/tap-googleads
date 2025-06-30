@@ -84,7 +84,7 @@ class ClickViewReportStream(DynamicQueryStream):
     def request_records(self, context):
         start_value = self.get_starting_replication_key_value(context)
 
-        start_date = datetime.date.fromisoformat(start_value) if start_value else self.start_date
+        start_date = datetime.date.fromisoformat(start_value) if start_value else datetime.date.fromisoformat(self.config["start_date"])
         end_date = datetime.date.fromisoformat(self.config["end_date"])
 
         delta = end_date - start_date
