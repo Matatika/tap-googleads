@@ -16,7 +16,12 @@ if TYPE_CHECKING:
 class ClickViewReportStream(DynamicQueryStream):
     """Stream for click view reports."""
     
-    date: datetime.date
+    # date: datetime.date
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.date: datetime.date | None = None
 
     @property
     def gaql(self):
