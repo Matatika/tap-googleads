@@ -16,11 +16,7 @@ if TYPE_CHECKING:
 class ClickViewReportStream(DynamicQueryStream):
     """Stream for click view reports."""
     
-    # date: datetime.date
-
-    def __init__(self, *args, **kwargs) -> None:
-        self.date: datetime.date | None = None
-        super().__init__(*args, **kwargs)
+    date: datetime.date
 
     @property
     def gaql(self):
@@ -88,7 +84,7 @@ class ClickViewReportStream(DynamicQueryStream):
     def request_records(self, context):
         start_value = self.get_starting_replication_key_value(context)
 
-        start_date = datetime.date.fromisoformat(start_value)
+        start_date = datetime.date.fromisoformat(start_value) if start_value else self.start_date
         end_date = datetime.date.fromisoformat(self.config["end_date"])
 
         delta = end_date - start_date
