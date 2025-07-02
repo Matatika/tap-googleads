@@ -18,6 +18,10 @@ class ClickViewReportStream(DynamicQueryStream):
     
     date: datetime.date
 
+    def __init__(self, *args, **kwargs) -> None:
+        self.date = datetime.date.fromisoformat(self.config["start_date"])
+        super().__init__(*args, **kwargs)
+
     @property
     def gaql(self):
         return f"""
