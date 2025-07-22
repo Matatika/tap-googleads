@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from functools import cached_property
 from typing import Any, Dict, List
 
+import datetime
 import humps
 import requests
 import sqlparse
-
 from singer_sdk.helpers._flattening import flatten_record
 
 from tap_googleads.streams import ReportsStream
@@ -50,7 +52,7 @@ class DynamicQueryStream(ReportsStream):
 
     def _apply_date_filter_to_query(self, context):
         """Apply date filter to the query at request time."""
-        if hasattr(self, '_date_filter_applied') and self._date_filter_applied:
+        if hasattr(self, "_date_filter_applied") and self._date_filter_applied:
             return
 
         start_date = self.get_starting_replication_key_value(context)
@@ -60,9 +62,15 @@ class DynamicQueryStream(ReportsStream):
             start_date = f"'{start_date}'"
         query = self.gaql
         if "WHERE" in query.upper():
-            self.gaql = query.rstrip() + f" AND segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+            self.gaql = (
+                query.rstrip()
+                + f" AND segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+            )
         else:
-            self.gaql = query.rstrip() + f" WHERE segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+            self.gaql = (
+                query.rstrip()
+                + f" WHERE segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+            )
 
         self._date_filter_applied = True
 
@@ -173,6 +181,8 @@ class DynamicQueryStream(ReportsStream):
             # {'metrics': {'costMicros': 1000000}} which gets converted to metrics__costMicros
             field_name = "__".join([humps.camelize(i) for i in field.split(".")])
             local_json_schema["properties"][field_name] = field_value
+            if self.name == "click_view_report":
+                local_json_schema["properties"]["date"] = {"type": ["string", "null"],"format": "date"}
         # This is always present in the response
         local_json_schema["properties"]["customer_id"] = {"type": ["string", "null"]}
         return local_json_schema
@@ -199,3 +209,4 @@ class DynamicQueryStream(ReportsStream):
             self._apply_date_filter_to_query(context)
 
         return super().prepare_request(context, next_page_token)
+

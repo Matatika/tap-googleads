@@ -10,6 +10,7 @@ class AdGroupAdStream(DynamicQueryStream):
         return """
         SELECT
           ad_group.id,
+          ad_group_ad.ad.id,
           ad_group_ad.ad.added_by_google_ads,
           ad_group_ad.ad.app_ad.descriptions,
           ad_group_ad.ad.app_ad.headlines,
@@ -136,6 +137,7 @@ class AdGroupAdStream(DynamicQueryStream):
           ad_group_ad.ad.video_responsive_ad.headlines,
           ad_group_ad.ad.video_responsive_ad.long_headlines,
           ad_group_ad.ad.video_responsive_ad.videos,
+          ad_group_ad.action_items,
           ad_group_ad.ad_group,
           ad_group_ad.ad_strength,
           ad_group_ad.labels,
@@ -144,12 +146,13 @@ class AdGroupAdStream(DynamicQueryStream):
           ad_group_ad.policy_summary.review_status,
           ad_group_ad.resource_name,
           ad_group_ad.status,
+          ad_group.name,
           segments.date
         FROM ad_group_ad
         """
 
     name = "ad_group_ad"
-    primary_keys = ["adGroup__id", "adGroupAd__ad__id"]
+    primary_keys = ["adGroup__id","adGroupAd__ad__id","segments__date"]
     replication_key = "segments__date"
     replication_method = "INCREMENTAL"
     add_date_filter_to_query = True
