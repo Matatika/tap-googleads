@@ -7,8 +7,6 @@ class CustomQueryStream(DynamicQueryStream):
     """Define custom stream."""
 
     records_jsonpath = "$.results[*]"
-    primary_keys = []
-    replication_key = None
     add_date_filter_to_query = True
 
     def __init__(self, *args, **kwargs) -> None:
@@ -27,8 +25,12 @@ class CustomQueryStream(DynamicQueryStream):
         self._custom_query = kwargs.pop("custom_query")
         self._gaql = self._custom_query['query']
         self.name = self._custom_query['name']
-        self.add_date_filter_to_query = self._custom_query['add_date_filter_to_query']
+        self.add_date_filter_to_query = self._custom_query['add_date_filter_to_query']      
         super().__init__(*args, **kwargs)
+        
+        self.replication_key = self._custom_query.get("replication_key")
+        self._primary_keys = self._custom_query.get("primary_keys", [])
+        self._replication_method = self._custom_query.get("replication_method")
 
     @property
     def gaql(self):

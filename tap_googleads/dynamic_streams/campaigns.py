@@ -1,17 +1,39 @@
 """CampaignsStream for Google Ads tap."""
-
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
 class CampaignsStream(DynamicQueryStream):
     """Define custom stream."""
 
-    @property
-    def gaql(self):
+    def _get_gaql(self):
         return """
-        SELECT campaign.id, campaign.name FROM campaign ORDER BY campaign.id
+        SELECT 
+          campaign.id,
+          campaign.name,
+          customer.id,
+          campaign.ad_serving_optimization_status,
+          campaign.advertising_channel_sub_type,
+          campaign.advertising_channel_type,
+          campaign.experiment_type,
+          campaign.end_date,
+          campaign.final_url_suffix,
+          campaign.frequency_caps,
+          campaign.name,
+          campaign.optimization_score,
+          campaign.payment_mode,
+          campaign.serving_status,
+          campaign.start_date,
+          campaign.status,
+          campaign.tracking_url_template,
+          campaign.vanity_pharma.vanity_pharma_display_url_mode,
+          campaign.vanity_pharma.vanity_pharma_text,
+          campaign.video_brand_safety_suitability,
+          segments.date
+        FROM campaign
         """
 
-    name = "campaign"
-    primary_keys = ["campaign__id"]
-    replication_key = None 
+    name = "campaign_history"
+    primary_keys = ["campaign__id","segments__date"]
+    replication_key = "segments__date"
+    replication_method = "INCREMENTAL"
+    add_date_filter_to_query = True
