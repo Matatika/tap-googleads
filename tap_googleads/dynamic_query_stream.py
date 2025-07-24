@@ -184,6 +184,7 @@ class DynamicQueryStream(ReportsStream):
             schema_updates = {
                 "click_view_report": {
                     "date": {"type": ["string", "null"], "format": "date"},
+                    "campaign__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "campaign_history": {
@@ -193,6 +194,8 @@ class DynamicQueryStream(ReportsStream):
                 },
                 "ad_group_ad": {
                     "adGroup__resourceName": {"type": ["string", "null"]},
+                    "adGroupAd__ad__responsiveSearchAd": {"type": ["string", "null"]},
+                    "adGroupAd__ad__responsiveDisplayAd": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "customer": {
