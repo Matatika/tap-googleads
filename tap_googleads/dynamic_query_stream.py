@@ -184,16 +184,63 @@ class DynamicQueryStream(ReportsStream):
             schema_updates = {
                 "click_view_report": {
                     "date": {"type": ["string", "null"], "format": "date"},
+                    "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "campaign_history": {
                     "customer__resourceName": {"type": ["string", "null"]},
                     "campaign__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
-            }   
-            if self.name in schema_updates:
-                for key, value in schema_updates[self.name].items():
-                    local_json_schema["properties"][key] = value
+                "ad_group_ad": {
+                    "adGroup__resourceName": {"type": ["string", "null"]},
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+                "customer": {
+                    "customer__resourceName": {"type": ["string", "null"]},
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+                "label": {
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+                "managed_placement_view": {
+                    "customer__resourceName": {"type": ["string", "null"]},
+                    "campaign__resourceName": {"type": ["string", "null"]},
+                    "adGroup__resourceName": {"type": ["string", "null"]},
+                    "adGroupCriterion__resourceName": {"type": ["string", "null"]},
+                    "managedPlacementView__resourceName": {"type": ["string", "null"]},
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+                "search_term_view": {
+                    "customer__resourceName": {"type": ["string", "null"]},
+                    "campaign__resourceName": {"type": ["string", "null"]},
+                    "adGroup__resourceName": {"type": ["string", "null"]},
+                    "adGroupAd__resourceName": {"type": ["string", "null"]},
+                    "adGroupAd__ad__resourceName": {"type": ["string", "null"]},
+                    "searchTermView__resourceName": {"type": ["string", "null"]},
+                    "segments__keyword__info": {"type": ["string", "null"]},
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+                "keyword_view": {
+                    "customer__resourceName": {"type": ["string", "null"]},
+                    "campaign__resourceName": {"type": ["string", "null"]},
+                    "adGroup__resourceName": {"type": ["string", "null"]},
+                    "adGroupCriterion__resourceName": {"type": ["string", "null"]},
+                    "keywordView__resourceName": {"type": ["string", "null"]},
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+            }
+            updates = schema_updates.get(self.name, {}).copy()
+            config_updates = {}
+
+            for query in self.config.get("custom_queries", []):
+                if query.get("name") == self.name:
+                    config_updates = query.get("additional_schema_fields", {})
+                    break
+            #config_updates = self.config.get("additional_schema_fields", {}).get(self.name, {})
+            updates.update(config_updates)
+
+            for key, value in updates.items():
+                local_json_schema["properties"][key] = value
         # This is always present in the response
         local_json_schema["properties"]["customer_id"] = {"type": ["string", "null"]}
         return local_json_schema

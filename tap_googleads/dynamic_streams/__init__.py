@@ -29,7 +29,10 @@ from tap_googleads.dynamic_streams.user_interest import UserInterestStream
 from tap_googleads.dynamic_streams.customer_label import CustomerLabelStream
 from tap_googleads.dynamic_streams.customer import CustomerStream
 from tap_googleads.dynamic_streams.label import LabelStream
-
+from tap_googleads.dynamic_streams.keyword_view import KeywordViewStream
+from tap_googleads.dynamic_streams.gender_view import GenderViewStream
+from tap_googleads.dynamic_streams.managed_placement_view import ManagedPlacementViewStream
+from tap_googleads.dynamic_streams.search_term_view import SearchTermViewStream
 __all__ = [
     "AdGroupAdStream",
     "AdGroupAdLabelStream",
@@ -54,4 +57,8 @@ __all__ = [
     "CustomerLabelStream",
     "CustomerStream",
     "LabelStream",
+    "KeywordViewStream",
+    "GenderViewStream",
+    "ManagedPlacementViewStream",
+    "SearchTermViewStream",
 ]

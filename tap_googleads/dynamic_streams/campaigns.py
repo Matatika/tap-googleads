@@ -3,7 +3,7 @@ from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
 class CampaignsStream(DynamicQueryStream):
-    """Define custom stream."""
+    """Campaign stream."""
 
     def _get_gaql(self):
         return """
@@ -18,7 +18,6 @@ class CampaignsStream(DynamicQueryStream):
           campaign.end_date,
           campaign.final_url_suffix,
           campaign.frequency_caps,
-          campaign.name,
           campaign.optimization_score,
           campaign.payment_mode,
           campaign.serving_status,

@@ -31,6 +31,10 @@ from tap_googleads.dynamic_streams import (
     UserInterestStream,
     CustomerStream,
     LabelStream,
+    KeywordViewStream,
+    #GenderViewStream,
+    ManagedPlacementViewStream,
+    SearchTermViewStream,
 )
 from tap_googleads.streams import AccessibleCustomers, CustomerHierarchyStream
 
@@ -59,6 +63,10 @@ STREAM_TYPES = [
     CampaignLabelStream,
     CustomerStream,
     LabelStream,
+    KeywordViewStream,
+    # GenderViewStream,
+    ManagedPlacementViewStream,
+    SearchTermViewStream,
 ]
 
 CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")
@@ -156,20 +164,54 @@ class TapGoogleAds(Tap):
             "custom_queries",
             th.ArrayType(
                 th.ObjectType(
-                    th.Property("name", th.StringType, description="The name to assign to the query stream."),
                     th.Property(
-                        "query", th.StringType,
-                        description='A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to <a href="https://developers.google.com/google-ads/api/fields/v19/overview_query_builder">Google\'s documentation</a>.'
+                        "name",
+                        th.StringType,
+                        description="The name to assign to the query stream.",
                     ),
-                    th.Property("add_date_filter_to_query", th.BooleanType, description="Whether to add date filter to the query. Defaults to true.", default=True),
-                    th.Property("replication_key", th.StringType, description="The field to use as the replication key for incremental replication."),
-                    th.Property("primary_keys", th.ArrayType(th.StringType), description="The primary keys for the stream. Defaults to an empty list, which means no primary keys are set."),
-                    th.Property("replication_method", th.StringType, description="The replication method to use for the stream. Defaults to 'INCREMENTAL'.", default="INCREMENTAL"),
+                    th.Property(
+                        "query",
+                        th.StringType,
+                        description='A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to <a href="https://developers.google.com/google-ads/api/fields/v19/overview_query_builder">Google\'s documentation</a>.',
+                    ),
+                    th.Property(
+                        "add_date_filter_to_query",
+                        th.BooleanType,
+                        description="Whether to add date filter to the query. Defaults to true.",
+                        default=True,
+                    ),
+                    th.Property(
+                        "replication_key",
+                        th.StringType,
+                        description="The field to use as the replication key for incremental replication.",
+                    ),
+                    th.Property(
+                        "primary_keys",
+                        th.ArrayType(th.StringType),
+                        description="The primary keys for the stream. Defaults to an empty list, which means no primary keys are set.",
+                    ),
+                    th.Property(
+                        "replication_method",
+                        th.StringType,
+                        description="The replication method to use for the stream. Defaults to 'INCREMENTAL'.",
+                        default="INCREMENTAL",
+                    ),
+                    th.Property(
+                        "additional_schema_fields",
+                        th.ObjectType(
+                            additional_properties=th.ObjectType(
+                                th.Property("type", th.ArrayType(th.StringType)),
+                                th.Property("format", th.StringType, required=False),
+                            )
+                        ),
+                        description="A dictionary of additional schema fields to add to the stream schema.",
+                        default={},
+                    ),
                 ),
             ),
             description="A list of custom queries to run. Each query will be assigned a stream with the name specified in the `name` field.",
             default=[],
-        )
+        ),
     ).to_dict()
 
     def setup_mapper(self):
@@ -183,6 +225,9 @@ class TapGoogleAds(Tap):
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         if self.config["enable_click_view_report_stream"]:
             streams.append(ClickViewReportStream(tap=self))
-        streams.extend(CustomQueryStream(tap=self, custom_query=q) for q in self.config["custom_queries"])
+        streams.extend(
+            CustomQueryStream(tap=self, custom_query=q)
+            for q in self.config["custom_queries"]
+        )
 
         return streams
