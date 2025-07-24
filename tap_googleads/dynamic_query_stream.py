@@ -3,7 +3,6 @@ from __future__ import annotations
 from functools import cached_property
 from typing import Any, Dict, List
 
-import datetime
 import humps
 import requests
 import sqlparse
@@ -181,8 +180,20 @@ class DynamicQueryStream(ReportsStream):
             # {'metrics': {'costMicros': 1000000}} which gets converted to metrics__costMicros
             field_name = "__".join([humps.camelize(i) for i in field.split(".")])
             local_json_schema["properties"][field_name] = field_value
-            if self.name == "click_view_report":
-                local_json_schema["properties"]["date"] = {"type": ["string", "null"],"format": "date"}
+
+            schema_updates = {
+                "click_view_report": {
+                    "date": {"type": ["string", "null"], "format": "date"},
+                },
+                "campaign_history": {
+                    "customer__resourceName": {"type": ["string", "null"]},
+                    "campaign__resourceName": {"type": ["string", "null"]},
+                    "parent_customer_id": {"type": ["string", "null"]},
+                },
+            }   
+            if self.name in schema_updates:
+                for key, value in schema_updates[self.name].items():
+                    local_json_schema["properties"][key] = value
         # This is always present in the response
         local_json_schema["properties"]["customer_id"] = {"type": ["string", "null"]}
         return local_json_schema
