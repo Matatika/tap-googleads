@@ -200,7 +200,7 @@ class ClickViewReportStream(DynamicQueryStream):
 
         for self.date in dates:
             self.logger.info(f"Requesting records for date: {self.date} | customer_id: {context.get('customer_id')}")
-            records = list(super().request_records(context))
+            records = super().request_records(context)
 
             if not records:
                 self._increment_stream_state(
