@@ -172,12 +172,13 @@ class AdGroupAdStream(DynamicQueryStream):
           metrics.gmail_saves,
           metrics.all_conversions_value,
           campaign.name,
-          customer.descriptive_name
+          customer.descriptive_name,
+          ad_group.base_ad_group
         FROM ad_group_ad
         """
 
     name = "ad_group_ad"
-    primary_keys = ["adGroup__id","adGroupAd__ad__id","segments__date"]
+    primary_keys = ["adGroupAd__ad__id","segments__date"]
     replication_key = "segments__date"
     replication_method = "INCREMENTAL"
     add_date_filter_to_query = True
