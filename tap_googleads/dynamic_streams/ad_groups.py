@@ -6,10 +6,10 @@ from tap_googleads.dynamic_query_stream import DynamicQueryStream
 class AdGroupsStream(DynamicQueryStream):
     """Define custom stream."""
 
-    @property
-    def gaql(self):
+    def _get_gaql(self):
         return """
-       SELECT ad_group.url_custom_parameters, 
+       SELECT 
+       ad_group.url_custom_parameters, 
        ad_group.type, 
        ad_group.tracking_url_template, 
        ad_group.targeting_setting.target_restrictions,
@@ -34,10 +34,15 @@ class AdGroupsStream(DynamicQueryStream):
        ad_group.cpc_bid_micros,
        ad_group.campaign,
        ad_group.base_ad_group,
-       ad_group.ad_rotation_mode
+       ad_group.ad_rotation_mode,
+       campaign.id,
+       campaign.name,
+       segments.date
        FROM ad_group 
        """
 
     name = "adgroups"
-    primary_keys = ["adGroup__id", "adGroup__campaign", "adGroup__status"]
-    replication_key = None 
+    primary_keys = ["adGroup__id", "segments__date"]
+    replication_key = "segments__date"
+    replication_method = "INCREMENTAL"
+    add_date_filter_to_query = True
