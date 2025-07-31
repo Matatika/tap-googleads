@@ -15,7 +15,7 @@ class KeywordViewStream(DynamicQueryStream):
           ad_group_criterion.keyword.text, 
           customer.currency_code, 
           segments.slot, 
-          campaign.keyword_match_type, 
+          ad_group_criterion.keyword.match_type,
           ad_group_criterion.labels, 
           campaign.id, 
           ad_group_criterion.final_urls, 

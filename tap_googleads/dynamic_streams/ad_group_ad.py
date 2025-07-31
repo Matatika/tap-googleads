@@ -139,6 +139,8 @@ class AdGroupAdStream(DynamicQueryStream):
           ad_group_ad.ad.expanded_text_ad.headline_part2,
           ad_group_ad.ad.expanded_text_ad.headline_part1, 
           ad_group_ad.ad.expanded_text_ad.headline_part3, 
+          ad_group_ad.ad.expanded_text_ad.description,
+          ad_group_ad.ad.expanded_text_ad.description2,
           customer.currency_code, 
           segments.year,
           customer.time_zone,
