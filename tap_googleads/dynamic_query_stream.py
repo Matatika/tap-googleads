@@ -198,6 +198,8 @@ class DynamicQueryStream(ReportsStream):
                     "adGroupAd__ad__responsiveDisplayAd": {"type": ["string", "null"]},
                     "adGroupAd__ad__expandedTextAd": {"type": ["string", "null"]},
                     "adGroupAd__ad__imageAd": {"type": ["string", "null"]},
+                    "customer__resourceName": {"type": ["string", "null"]},
+                    "campaign__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "customer": {
