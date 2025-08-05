@@ -35,6 +35,7 @@ from tap_googleads.dynamic_streams import (
     #GenderViewStream,
     ManagedPlacementViewStream,
     SearchTermViewStream,
+    VideoStream,
 )
 from tap_googleads.streams import AccessibleCustomers, CustomerHierarchyStream
 
@@ -64,9 +65,9 @@ STREAM_TYPES = [
     CustomerStream,
     LabelStream,
     KeywordViewStream,
-    # GenderViewStream,
     ManagedPlacementViewStream,
     SearchTermViewStream,
+    VideoStream,
 ]
 
 CUSTOMER_ID_TYPE = th.StringType(pattern=r"^[0-9]{3}-?[0-9]{3}-?[0-9]{4}$")

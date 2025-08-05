@@ -33,6 +33,7 @@ from tap_googleads.dynamic_streams.keyword_view import KeywordViewStream
 from tap_googleads.dynamic_streams.gender_view import GenderViewStream
 from tap_googleads.dynamic_streams.managed_placement_view import ManagedPlacementViewStream
 from tap_googleads.dynamic_streams.search_term_view import SearchTermViewStream
+from tap_googleads.dynamic_streams.video import VideoStream
 __all__ = [
     "AdGroupAdStream",
     "AdGroupAdLabelStream",
@@ -61,4 +62,5 @@ __all__ = [
     "GenderViewStream",
     "ManagedPlacementViewStream",
     "SearchTermViewStream",
+    "VideoStream",
 ]
