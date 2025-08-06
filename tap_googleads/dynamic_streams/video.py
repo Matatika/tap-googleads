@@ -3,7 +3,7 @@ from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
 class VideoStream(DynamicQueryStream):
-    """Video stream."""
+    """Video stream"""
 
     def _get_gaql(self):
         return """
