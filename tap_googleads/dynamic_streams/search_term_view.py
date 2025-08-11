@@ -66,5 +66,4 @@ class SearchTermViewStream(DynamicQueryStream):
 
     name = "search_term_view"
     replication_key = "segments__date"
-    replication_method = "INCREMENTAL"
     add_date_filter_to_query = True

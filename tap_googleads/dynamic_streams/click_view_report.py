@@ -146,7 +146,6 @@ class ClickViewReportStream(DynamicQueryStream):
     name = "click_view_report"
     primary_keys = ["clickView__gclid"]
     replication_key = "date"
-    replication_method = "INCREMENTAL"
 
     def post_process(self, row, context):
         row["date"] = row["segments"].pop("date")

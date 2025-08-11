@@ -30,4 +30,3 @@ class GeoPerformance(DynamicQueryStream):
         "campaign__name",
         "segments__date",
     ]
-    replication_key = None 

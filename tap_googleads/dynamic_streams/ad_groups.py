@@ -44,5 +44,4 @@ class AdGroupsStream(DynamicQueryStream):
     name = "adgroups"
     primary_keys = ["adGroup__id", "segments__date"]
     replication_key = "segments__date"
-    replication_method = "INCREMENTAL"
     add_date_filter_to_query = True

@@ -67,4 +67,3 @@ class CampaignBudgetStream(DynamicQueryStream):
 
     name = "campaign_budget"
     primary_keys = ["customer__id", "campaign__id", "campaignBudget__id"]
-    replication_key = None 

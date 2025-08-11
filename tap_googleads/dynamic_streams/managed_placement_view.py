@@ -52,5 +52,4 @@ class ManagedPlacementViewStream(DynamicQueryStream):
     name = "managed_placement_view"
     primary_keys = ["customer__id", "segments__date"]
     replication_key = "segments__date"
-    replication_method = "INCREMENTAL"
     add_date_filter_to_query = True

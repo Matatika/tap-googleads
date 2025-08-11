@@ -23,4 +23,3 @@ class CampaignCriterionStream(DynamicQueryStream):
 
     name = "campaign_criterion"
     primary_keys = ["campaign__id", "campaignCriterion__resourceName"]
-    replication_key = None 

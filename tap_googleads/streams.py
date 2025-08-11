@@ -23,7 +23,6 @@ class AccessibleCustomers(GoogleAdsStream):
     path = "/customers:listAccessibleCustomers"
     name = "accessible_customers"
     primary_keys = ["resourceNames"]
-    replication_key = None
     schema = th.PropertiesList(
         th.Property("resourceNames", th.ArrayType(th.StringType)),
     ).to_dict()
@@ -68,7 +67,6 @@ class CustomerHierarchyStream(GoogleAdsStream):
     records_jsonpath = "$.results[*]"
     name = "customer_hierarchy"
     primary_keys = ["customerClient__id"]
-    replication_key = None
     parent_stream_type = AccessibleCustomers
     schema = th.PropertiesList(
         th.Property("customer_id", th.StringType),

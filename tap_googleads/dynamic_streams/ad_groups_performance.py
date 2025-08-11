@@ -29,4 +29,3 @@ class AdGroupsPerformance(DynamicQueryStream):
 
     name = "ad_groups_performance"
     primary_keys = ["campaign__id", "adGroup__id", "segments__date"]
-    replication_key = None 

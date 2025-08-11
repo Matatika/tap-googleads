@@ -19,4 +19,3 @@ class CustomerLabelStream(DynamicQueryStream):
 
     name = "customer_label"
     primary_keys = ["customerLabel__resourceName"]
-    replication_key = None 

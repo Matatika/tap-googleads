@@ -22,4 +22,3 @@ class UserInterestStream(DynamicQueryStream):
 
     name = "user_interest"
     primary_keys = ["userInterest__userInterestId"]
-    replication_key = None 

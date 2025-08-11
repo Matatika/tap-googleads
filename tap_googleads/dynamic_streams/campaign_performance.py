@@ -19,4 +19,3 @@ class CampaignPerformance(DynamicQueryStream):
         "segments__date",
         "segments__device",
     ]
-    replication_key = None
