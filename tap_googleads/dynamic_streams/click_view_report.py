@@ -144,18 +144,7 @@ class ClickViewReportStream(DynamicQueryStream):
         """
 
     name = "click_view_report"
-    primary_keys = [
-        "clickView__gclid",
-        "clickView__keyword",
-        "clickView__keywordInfo__matchType",
-        "customer__id",
-        "adGroup__id",
-        "campaign__id",
-        "segments__device",
-        "segments__adNetworkType",
-        "segments__slot",
-        "date"
-    ]
+    primary_keys = ["clickView__gclid"]
     replication_key = "date"
     replication_method = "INCREMENTAL"
 
