@@ -55,4 +55,5 @@ class VideoStream(DynamicQueryStream):
     name = "video"
     replication_key = "segments__date"
     replication_method = "INCREMENTAL"
+    primary_keys = ["video__id", "adGroupAd__ad__id", "segments__device", "segments__ad_network_type", "segments__date"]
     add_date_filter_to_query = True
