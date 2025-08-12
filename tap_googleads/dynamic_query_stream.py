@@ -182,11 +182,6 @@ class DynamicQueryStream(ReportsStream):
             local_json_schema["properties"][field_name] = field_value
 
             schema_updates = {
-                "click_view_report": {
-                    "date": {"type": ["string", "null"], "format": "date"},
-                    "campaign__resourceName": {"type": ["string", "null"]},
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
                 "campaign_history": {
                     "customer__resourceName": {"type": ["string", "null"]},
                     "campaign__resourceName": {"type": ["string", "null"]},

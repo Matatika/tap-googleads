@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import datetime
+from functools import cached_property
 from http import HTTPStatus
+
+from singer_sdk import typing as th
 
 from tap_googleads.client import ResumableAPIError
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
-
 
 
 class ClickViewReportStream(DynamicQueryStream):
@@ -142,6 +144,14 @@ class ClickViewReportStream(DynamicQueryStream):
         FROM click_view
         WHERE segments.date = '{self.date.isoformat()}'
         """
+
+    @cached_property
+    def schema(self):
+        schema = super().schema
+        properties: dict = schema["properties"]
+        properties.update(th.Property("date", th.DateType).to_dict())
+
+        return schema
 
     name = "click_view_report"
     primary_keys = ["clickView__gclid"]
