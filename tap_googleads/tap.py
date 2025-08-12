@@ -23,7 +23,7 @@ from tap_googleads.dynamic_streams import (
     CampaignPerformanceByAgeRangeAndDevice,
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
-    CampaignsStream,
+    CampaignHistoryStream,
     ClickViewReportStream,
     CustomerLabelStream,
     GeoPerformance,
@@ -40,7 +40,7 @@ from tap_googleads.dynamic_streams import (
 from tap_googleads.streams import AccessibleCustomers, CustomerHierarchyStream
 
 STREAM_TYPES = [
-    CampaignsStream,
+    CampaignHistoryStream,
     AdGroupsStream,
     AdGroupsPerformance,
     AdGroupAdStream,
