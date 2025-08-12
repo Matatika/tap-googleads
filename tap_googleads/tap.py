@@ -173,7 +173,7 @@ class TapGoogleAds(Tap):
                     th.Property(
                         "query",
                         th.StringType,
-                        description='A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to <a href="https://developers.google.com/google-ads/api/fields/v19/overview_query_builder">Google\'s documentation</a>.',
+                        description="A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to [Google's documentation](https://developers.google.com/google-ads/api/fields/v19/overview_query_builder).",
                     ),
                     th.Property(
                         "add_date_filter_to_query",
