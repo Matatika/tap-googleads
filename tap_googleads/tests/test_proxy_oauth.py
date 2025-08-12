@@ -1,6 +1,7 @@
 """Tests the tap using a mock proxy oauth config."""
 
 import unittest
+from unittest import mock
 
 import responses
 import singer_sdk._singerlib as singer
@@ -26,27 +27,43 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         del test_utils.SINGER_MESSAGES[:]
         TapGoogleAds.write_message = test_utils.accumulate_singer_messages
 
+        responses.add(
+            responses.POST,
+            "http://localhost:8080/api/tokens/oauth2-google/token",
+            json={"access_token": "refresh_token_updated", "expires_in": 3622},
+            status=200,
+        )
+
+        patcher = mock.patch(
+            "tap_googleads.dynamic_query_stream.DynamicQueryStream.get_fields_metadata"
+        )
+
+        mock_get_fields_metadata = patcher.start()
+        mock_get_fields_metadata.side_effect = lambda fields: {
+            f: {
+                "name": f,
+                "dataType": "STRING",
+            }
+            for f in fields
+        }
+
+        self.addCleanup(patcher.stop)
+
+    @responses.activate
     def test_proxy_oauth_discovery(self):
         """Test basic discover sync with proxy refresh credentials"""
 
         catalog = TapGoogleAds(config=self.mock_config).discover_streams()
 
         # Assert the correct number of default streams found
-        self.assertEqual(len(catalog), 11, "Total streams from default catalog")
+        self.assertEqual(len(catalog), 28, "Total streams from default catalog")
 
     @responses.activate
     def test_proxy_oauth_refresh(self):
         """Test proxy oauth refresh"""
 
         tap = test_utils.set_up_tap_with_custom_catalog(
-            self.mock_config, ["stream_accessible_customers"]
-        )
-
-        responses.add(
-            responses.POST,
-            "http://localhost:8080/api/tokens/oauth2-google/token",
-            json={"access_token": "refresh_token_updated", "expires_in": 3622},
-            status=200,
+            self.mock_config, ["accessible_customers"]
         )
 
         responses.add(
@@ -77,7 +94,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         )
 
         # Assert that messages are output from sync (its actually working).
-        self.assertEqual(len(test_utils.SINGER_MESSAGES), 15)
+        self.assertEqual(len(test_utils.SINGER_MESSAGES), 32)
         self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.StateMessage)
         self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.SchemaMessage)
         self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.RecordMessage)
