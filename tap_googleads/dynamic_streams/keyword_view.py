@@ -45,12 +45,12 @@ class KeywordViewStream(DynamicQueryStream):
           campaign.status, 
           ad_group_criterion.position_estimates.estimated_add_clicks_at_first_position_cpc, 
           metrics.cost_micros, 
-          campaign.bidding_strategy_type 
+          campaign.bidding_strategy_type
         FROM keyword_view 
         """
 
     name = "keyword_view"
     replication_key = "segments__date"
     replication_method = "INCREMENTAL"
-    primary_keys = ["ad_group_criterion__criterion_id","adGroup__id","segments__device","segments__slot", "segments__date"]
+    primary_keys = ["ad_group_criterion__criterion_id","adGroup__id","segments__device","segments__slot", "segments__ad_network_type","segments__date"]
     add_date_filter_to_query = True
