@@ -199,29 +199,7 @@ class DynamicQueryStream(ReportsStream):
             field_name = "__".join([humps.camelize(i) for i in field.split(".")])
             local_json_schema["properties"][field_name] = field_value
 
-            schema_updates = {
-                "campaign_history": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-                "ad_group_ad": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-                "customer": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-                "label": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-                "managed_placement_view": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-                "search_term_view": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-                "keyword_view": {
-                    "parent_customer_id": {"type": ["string", "null"]},
-                },
-            }
+            schema_updates = {}
             updates = schema_updates.get(self.name, {}).copy()
             config_updates = {}
 
@@ -234,8 +212,11 @@ class DynamicQueryStream(ReportsStream):
 
             for key, value in updates.items():
                 local_json_schema["properties"][key] = value
-        # This is always present in the response
+
+        # these are injected from context
         local_json_schema["properties"]["customer_id"] = {"type": ["string", "null"]}
+        local_json_schema["properties"]["parent_customer_id"] = {"type": ["string", "null"]}
+
         return local_json_schema
 
     def post_process(  # noqa: PLR6301
