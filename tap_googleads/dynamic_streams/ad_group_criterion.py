@@ -10,6 +10,7 @@ class AdGroupCriterionStream(DynamicQueryStream):
     def gaql(self):
         return """
         SELECT
+          ad_group.resource_name,
           ad_group.id,
           ad_group_criterion.ad_group,
           ad_group_criterion.age_range.type,

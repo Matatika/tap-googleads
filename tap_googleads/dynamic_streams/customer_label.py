@@ -10,6 +10,7 @@ class CustomerLabelStream(DynamicQueryStream):
     def gaql(self):
         return """
         SELECT
+          customer.resource_name,
           customer.id,
           customer_label.resource_name,
           customer_label.customer,

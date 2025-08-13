@@ -10,6 +10,7 @@ class GeoPerformance(DynamicQueryStream):
     def gaql(self):
         return f"""
     SELECT 
+        campaign.resource_name,
         campaign.name, 
         campaign.status, 
         segments.date, 
@@ -17,6 +18,7 @@ class GeoPerformance(DynamicQueryStream):
         metrics.cost_micros,
         metrics.impressions, 
         metrics.conversions,
+        geographic_view.resource_name,
         geographic_view.location_type,
         geographic_view.country_criterion_id
     FROM geographic_view 

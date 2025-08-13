@@ -35,6 +35,7 @@ class AdGroupsStream(DynamicQueryStream):
        ad_group.campaign,
        ad_group.base_ad_group,
        ad_group.ad_rotation_mode,
+       campaign.resource_name,
        campaign.id,
        campaign.name,
        segments.date

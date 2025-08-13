@@ -9,6 +9,7 @@ class AdGroupAdStream(DynamicQueryStream):
     def _get_gaql(self):
         return """
         SELECT
+          ad_group.resource_name,
           ad_group.id,
           ad_group_ad.ad.id,
           ad_group_ad.ad.added_by_google_ads,
@@ -133,6 +134,7 @@ class AdGroupAdStream(DynamicQueryStream):
           ad_group_ad.status,
           ad_group.name,
           segments.date,
+          customer.resource_name,
           customer.id,
           metrics.conversions,
           segments.month,
@@ -154,6 +156,7 @@ class AdGroupAdStream(DynamicQueryStream):
           metrics.impressions,
           metrics.view_through_conversions, 
           metrics.video_views, 
+          campaign.resource_name,
           campaign.status,
           metrics.gmail_secondary_clicks, 
           metrics.active_view_ctr, 

@@ -15,6 +15,7 @@ class GeotargetsStream(DynamicQueryStream):
 
     gaql = """
     SELECT 
+        geo_target_constant.resource_name,
         geo_target_constant.canonical_name,
         geo_target_constant.country_code,
         geo_target_constant.id,

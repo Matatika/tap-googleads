@@ -10,6 +10,7 @@ class CampaignCriterionStream(DynamicQueryStream):
     def gaql(self):
         return """
         SELECT
+          campaign.resource_name,
           campaign.id,
           campaign_criterion.resource_name,
           campaign_criterion.campaign,

@@ -8,6 +8,7 @@ class CustomerStream(DynamicQueryStream):
     def _get_gaql(self):
         return """
         SELECT
+          customer.resource_name,
           customer.id,
           customer.auto_tagging_enabled,
           customer.descriptive_name,

@@ -201,46 +201,24 @@ class DynamicQueryStream(ReportsStream):
 
             schema_updates = {
                 "campaign_history": {
-                    "customer__resourceName": {"type": ["string", "null"]},
-                    "campaign__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "ad_group_ad": {
-                    "adGroup__resourceName": {"type": ["string", "null"]},
-                    "customer__resourceName": {"type": ["string", "null"]},
-                    "campaign__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "customer": {
-                    "customer__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "label": {
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "managed_placement_view": {
-                    "customer__resourceName": {"type": ["string", "null"]},
-                    "campaign__resourceName": {"type": ["string", "null"]},
-                    "adGroup__resourceName": {"type": ["string", "null"]},
-                    "adGroupCriterion__resourceName": {"type": ["string", "null"]},
-                    "managedPlacementView__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "search_term_view": {
-                    "customer__resourceName": {"type": ["string", "null"]},
-                    "campaign__resourceName": {"type": ["string", "null"]},
-                    "adGroup__resourceName": {"type": ["string", "null"]},
-                    "adGroupAd__resourceName": {"type": ["string", "null"]},
-                    "adGroupAd__ad__resourceName": {"type": ["string", "null"]},
-                    "searchTermView__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "keyword_view": {
-                    "customer__resourceName": {"type": ["string", "null"]},
-                    "campaign__resourceName": {"type": ["string", "null"]},
-                    "adGroup__resourceName": {"type": ["string", "null"]},
-                    "adGroupCriterion__resourceName": {"type": ["string", "null"]},
-                    "keywordView__resourceName": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
             }

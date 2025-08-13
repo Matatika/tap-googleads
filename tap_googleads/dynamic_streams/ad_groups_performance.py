@@ -10,7 +10,9 @@ class AdGroupsPerformance(DynamicQueryStream):
     def gaql(self):
         return f"""
         SELECT
+            campaign.resource_name,
             campaign.id,
+            ad_group.resource_name,
             ad_group.id,
             metrics.impressions,
             metrics.clicks,

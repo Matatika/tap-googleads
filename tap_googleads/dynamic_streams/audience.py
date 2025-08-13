@@ -10,6 +10,7 @@ class AudienceStream(DynamicQueryStream):
     def gaql(self):
         return """
         SELECT
+          customer.resource_name,
           customer.id,
           audience.description,
           audience.dimensions,

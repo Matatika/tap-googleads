@@ -8,18 +8,23 @@ class ManagedPlacementViewStream(DynamicQueryStream):
     def _get_gaql(self):
         return """
         SELECT 
+          managed_placement_view.resource_name,
+          customer.resource_name,
           customer.id, 
           segments.date, 
           metrics.conversions, 
           ad_group_criterion.status, 
           customer.currency_code, 
           customer.time_zone, 
+          campaign.resource_name,
           campaign.id, 
+          ad_group_criterion.resource_name,
           ad_group_criterion.final_urls, 
           segments.device, 
           ad_group_criterion.final_mobile_urls, 
           ad_group_criterion.placement.url, 
           metrics.gmail_forwards, 
+          ad_group.resource_name,
           ad_group.name, 
           ad_group_criterion.effective_cpc_bid_source, 
           metrics.clicks, 
