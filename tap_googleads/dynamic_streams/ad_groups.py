@@ -40,4 +40,4 @@ class AdGroupsStream(DynamicQueryStream):
 
     name = "adgroups"
     primary_keys = ["adGroup__id", "adGroup__campaign", "adGroup__status"]
-    replication_key = None 
+    replication_key = None

@@ -14,4 +14,4 @@ class CampaignsStream(DynamicQueryStream):
 
     name = "campaign"
     primary_keys = ["campaign__id"]
-    replication_key = None 
+    replication_key = None

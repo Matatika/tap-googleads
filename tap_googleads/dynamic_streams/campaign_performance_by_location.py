@@ -18,4 +18,4 @@ class CampaignPerformanceByLocation(DynamicQueryStream):
         "campaign__name",
         "segments__date",
     ]
-    replication_key = None 
+    replication_key = None

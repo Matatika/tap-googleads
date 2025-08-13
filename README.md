@@ -17,7 +17,7 @@ meltano add extractor tap-googleads
 To use standalone, you can use the following:
 
 ```bash
-pip install https://github.com/Matatika/tap-googleads.git
+uv tool install https://github.com/Matatika/tap-googleads.git
 ```
 
 
@@ -110,8 +110,8 @@ tap-googleads --config CONFIG --discover > ./catalog.json
 ### Initialize your Development Environment
 
 ```bash
-pipx install poetry
-poetry install
+curl -LsSf https://astral.sh/uv/install.sh | sh  # https://docs.astral.sh/uv/getting-started/installation/
+uv sync
 ```
 
 ### Create and Run Tests
@@ -141,7 +141,7 @@ Next, install Meltano (if you haven't already) and any needed plugins:
 
 ```bash
 # Install meltano
-pipx install meltano
+uv tool install meltano
 # Initialize meltano within this directory
 cd tap-googleads
 meltano install
@@ -152,8 +152,8 @@ Now you can test and orchestrate using Meltano:
 ```bash
 # Test invocation:
 meltano invoke tap-googleads --version
-# OR run a test `elt` pipeline:
-meltano elt tap-googleads target-jsonl
+# OR run a test EL pipeline:
+meltano run tap-googleads target-jsonl
 ```
 
 ### SDK Dev Guide

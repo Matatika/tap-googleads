@@ -40,4 +40,4 @@ class AdListingGroupCriterionStream(DynamicQueryStream):
 
     name = "ad_listing_group_criterion"
     primary_keys = ["adGroup__id", "adGroupCriterion__criterionId"]
-    replication_key = None 
+    replication_key = None

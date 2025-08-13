@@ -40,4 +40,4 @@ class GeotargetsStream(DynamicQueryStream):
 
         """
         yield from super().get_records(context)
-        self.selected = False  # sync once only 
+        self.selected = False  # sync once only

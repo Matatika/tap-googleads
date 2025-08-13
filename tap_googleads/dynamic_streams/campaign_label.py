@@ -21,4 +21,4 @@ class CampaignLabelStream(DynamicQueryStream):
 
     name = "campaign_label"
     primary_keys = ["campaign__id", "label__id"]
-    replication_key = None 
+    replication_key = None

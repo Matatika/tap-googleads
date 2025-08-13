@@ -23,4 +23,4 @@ class AudienceStream(DynamicQueryStream):
 
     name = "audience"
     primary_keys = ["customer__id", "audience__id"]
-    replication_key = None 
+    replication_key = None

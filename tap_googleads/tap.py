@@ -183,5 +183,8 @@ class TapGoogleAds(Tap):
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         if self.config.get("enable_click_view_report_stream"):
             streams.append(ClickViewReportStream(tap=self))
-        streams.extend(CustomQueryStream(tap=self, custom_query=q) for q in self.config["custom_queries"])
+        streams.extend(
+            CustomQueryStream(tap=self, custom_query=q)
+            for q in self.config["custom_queries"]
+        )
         return streams

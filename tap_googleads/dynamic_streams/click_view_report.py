@@ -4,22 +4,18 @@ from __future__ import annotations
 
 import datetime
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Dict
 
 from tap_googleads.client import ResumableAPIError
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
-if TYPE_CHECKING:
-    from singer_sdk.helpers.types import Context
-
 
 class ClickViewReportStream(DynamicQueryStream):
     """Stream for click view reports."""
-    
+
     date: datetime.date
 
     @property
-    def gaql(self):
+    def gaql(self) -> str:
         return f"""
         SELECT
             click_view.gclid
@@ -109,4 +105,4 @@ class ClickViewReportStream(DynamicQueryStream):
             )
             raise ResumableAPIError(msg, response)
 
-        super().validate_response(response) 
+        super().validate_response(response)

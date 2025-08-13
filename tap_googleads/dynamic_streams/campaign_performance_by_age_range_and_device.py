@@ -20,4 +20,4 @@ class CampaignPerformanceByAgeRangeAndDevice(DynamicQueryStream):
         "campaign__status",
         "segments__device",
     ]
-    replication_key = None 
+    replication_key = None
