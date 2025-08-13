@@ -187,13 +187,8 @@ class DynamicQueryStream(ReportsStream):
                     "ad_group_criterion.webpage.sample.*",
                 ]
             ):
-                field, sub_field = field.rsplit(".", 1)
-                sub_field_value = field_value
-
-                field_value = local_json_schema["properties"].setdefault(
-                    field, {"type": ["object", "null"], "properties": {}}
-                )
-                field_value["properties"][sub_field] = sub_field_value
+                field = field.rsplit(".", 1)[0]
+                field_value = {"type": ["string", "null"]}
 
             # GAQL fields look like metrics.cost_micros and response looks like
             # {'metrics': {'costMicros': 1000000}} which gets converted to metrics__costMicros
