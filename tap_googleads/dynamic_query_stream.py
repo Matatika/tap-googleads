@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 import humps
 import requests
 import sqlparse
+from singer_sdk.exceptions import FatalAPIError
 from singer_sdk.helpers._flattening import flatten_record
 
 from tap_googleads.streams import ReportsStream
@@ -108,7 +109,10 @@ class DynamicQueryStream(ReportsStream):
             "developer-token": self.config["developer_token"],
         }
         response = requests.post(base_url, json=payload, headers=headers)
-        response.raise_for_status()
+
+        if not response.ok:
+            msg = self.response_error_message(response)
+            raise FatalAPIError(msg)
 
         response_data = response.json()
         return {item.get("name"): item for item in response_data.get("results", [])}
