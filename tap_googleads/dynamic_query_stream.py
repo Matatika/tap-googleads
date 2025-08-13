@@ -184,6 +184,7 @@ class DynamicQueryStream(ReportsStream):
                 for p in [
                     "ad_group_ad.ad.*_ad.*",
                     "segments.keyword.info.*",
+                    "ad_group_criterion.webpage.sample.*",
                 ]
             ):
                 field, sub_field = field.rsplit(".", 1)
