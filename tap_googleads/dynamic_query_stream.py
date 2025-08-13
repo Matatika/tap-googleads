@@ -215,7 +215,6 @@ class DynamicQueryStream(ReportsStream):
                     "adGroupAd__resourceName": {"type": ["string", "null"]},
                     "adGroupAd__ad__resourceName": {"type": ["string", "null"]},
                     "searchTermView__resourceName": {"type": ["string", "null"]},
-                    "segments__keyword__info": {"type": ["string", "null"]},
                     "parent_customer_id": {"type": ["string", "null"]},
                 },
                 "keyword_view": {
