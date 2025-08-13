@@ -197,17 +197,6 @@ class TapGoogleAds(Tap):
                         description="The replication method to use for the stream. Defaults to 'INCREMENTAL'.",
                         default="INCREMENTAL",
                     ),
-                    th.Property(
-                        "additional_schema_fields",
-                        th.ObjectType(
-                            additional_properties=th.ObjectType(
-                                th.Property("type", th.ArrayType(th.StringType)),
-                                th.Property("format", th.StringType, required=False),
-                            )
-                        ),
-                        description="A dictionary of additional schema fields to add to the stream schema.",
-                        default={},
-                    ),
                 ),
             ),
             description="A list of custom queries to run. Each query will be assigned a stream with the name specified in the `name` field.",

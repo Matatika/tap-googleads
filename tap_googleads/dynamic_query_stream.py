@@ -199,20 +199,6 @@ class DynamicQueryStream(ReportsStream):
             field_name = "__".join([humps.camelize(i) for i in field.split(".")])
             local_json_schema["properties"][field_name] = field_value
 
-            schema_updates = {}
-            updates = schema_updates.get(self.name, {}).copy()
-            config_updates = {}
-
-            for query in self.config.get("custom_queries", []):
-                if query.get("name") == self.name:
-                    config_updates = query.get("additional_schema_fields", {})
-                    break
-            #config_updates = self.config.get("additional_schema_fields", {}).get(self.name, {})
-            updates.update(config_updates)
-
-            for key, value in updates.items():
-                local_json_schema["properties"][key] = value
-
         # these are injected from context
         local_json_schema["properties"]["customer_id"] = {"type": ["string", "null"]}
         local_json_schema["properties"]["parent_customer_id"] = {"type": ["string", "null"]}
