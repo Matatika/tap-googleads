@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import fnmatch
 from functools import cached_property
 from typing import Any, Dict, List
 
@@ -175,6 +176,23 @@ class DynamicQueryStream(ReportsStream):
 
             if node.get("isRepeated", False):
                 field_value = {"type": ["null", "array"], "items": field_value}
+
+            # some fields are returned under a single JSON object for some reason -
+            # update schema to reflect this
+            if any(
+                fnmatch.fnmatch(field, p)
+                for p in [
+                    "ad_group_ad.ad.*_ad.*",
+                    "segments.keyword.info.*",
+                ]
+            ):
+                field, sub_field = field.rsplit(".", 1)
+                sub_field_value = field_value
+
+                field_value = local_json_schema["properties"].setdefault(
+                    field, {"type": ["object", "null"], "properties": {}}
+                )
+                field_value["properties"][sub_field] = sub_field_value
 
             # GAQL fields look like metrics.cost_micros and response looks like
             # {'metrics': {'costMicros': 1000000}} which gets converted to metrics__costMicros

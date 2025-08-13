@@ -1,12 +1,4 @@
 """SearchTermViewStream for Google Ads tap."""
-
-from __future__ import annotations
-
-import fnmatch
-from functools import cached_property
-
-from singer_sdk import typing as th
-
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -75,25 +67,3 @@ class SearchTermViewStream(DynamicQueryStream):
     name = "search_term_view"
     replication_key = "segments__date"
     add_date_filter_to_query = True
-
-    @cached_property
-    def schema(self):
-        schema = super().schema
-        properties: dict[str] = schema["properties"]
-
-        # `segments.keyword.info.*` fields are returned in a single JSON object for
-        # some reason; update schema to reflect this
-        ad_group_ad_specific = {
-            p: properties.pop(p)
-            for p in properties.copy()
-            if fnmatch.fnmatch(p, "segments__keyword__info__*")
-        }
-
-        if ad_group_ad_specific:
-            for k, v in ad_group_ad_specific.items():
-                field, sub_field = k.rsplit("__", 1)
-                field_type = th.ObjectType(nullable=True)
-                field_schema = properties.setdefault(field, field_type.to_dict())
-                field_schema["properties"][sub_field] = v
-
-        return schema
