@@ -6,6 +6,7 @@ from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
+
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
@@ -21,7 +22,8 @@ class ResumableAPIError(Exception):
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v18"
+    url_base = "https://googleads.googleapis.com/v20"
+    path = "/customers/{customer_id}/googleAds:searchStream"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
@@ -127,9 +129,10 @@ class GoogleAdsStream(RESTStream):
         params: dict = {}
         if next_page_token:
             params["pageToken"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+        # TODO: This doesn't appear to be valid params, need to look-into this further
+        # if self.replication_key:
+        #     params["sort"] = "asc"
+        #     params["order_by"] = self.replication_key
         return params
 
     def get_records(self, context):
@@ -139,14 +142,15 @@ class GoogleAdsStream(RESTStream):
             self.logger.warning(e)
 
     @property
-    def gaql(self):
+    def gaql(self) -> str:
         raise NotImplementedError
 
-    @property
-    def path(self) -> str:
-        # Paramas
-        path = "/customers/{customer_id}/googleAds:search?query="
-        return path + self.gaql
+    def prepare_request_payload(self, context, next_page_token):
+        if self.rest_method == "POST":
+            santised_query = " ".join(self.gaql.split())
+            return {"query": santised_query}
+
+        return None
 
     @cached_property
     def start_date(self):
