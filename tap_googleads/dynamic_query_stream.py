@@ -101,14 +101,18 @@ class DynamicQueryStream(ReportsStream):
         """
 
         payload = {"query": query, "pageSize": len(fields)}
-
-        self.authenticator.update_access_token()
         headers = {
             "Authorization": f"Bearer {self.authenticator.access_token}",
             "Content-Type": "application/json",
             "developer-token": self.config["developer_token"],
         }
-        response = requests.post(base_url, json=payload, headers=headers)
+
+        response = requests.post(
+            base_url,
+            json=payload,
+            headers=headers,
+            auth=self.authenticator,
+        )
 
         if not response.ok:
             msg = self.response_error_message(response)
