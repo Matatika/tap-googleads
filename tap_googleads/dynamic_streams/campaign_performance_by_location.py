@@ -14,7 +14,7 @@ class CampaignPerformanceByLocation(DynamicQueryStream):
 
     name = "campaign_performance_by_location"
     primary_keys = [
-        "campaignCriterion__location__geoTargetConstant",
+        "locationView_resourceName",
         "campaign__name",
         "segments__date",
     ]
