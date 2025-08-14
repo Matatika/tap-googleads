@@ -205,15 +205,3 @@ class ClickViewReportStream(DynamicQueryStream):
                     {"date": self.date.isoformat()}, context=self.context
                 )
             yield from records
-            
-    def validate_response(self, response):
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            error_msg = self.response_error_message(response)
-
-            msg = (
-                f"Click view report not accessible to customer "
-                f"'{self.context.get('customer_id', 'unknown')}': {error_msg}"
-            )
-            raise ResumableAPIError(msg, response)
-
-        super().validate_response(response)
