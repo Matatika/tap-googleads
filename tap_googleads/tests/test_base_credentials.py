@@ -1,6 +1,7 @@
 """Tests the tap using a mock base credentials config."""
 
 import unittest
+from unittest import mock
 
 import responses
 import singer_sdk._singerlib as singer
@@ -28,20 +29,35 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
 
         TapGoogleAds.write_message = test_utils.accumulate_singer_messages
 
+        patcher = mock.patch(
+            "tap_googleads.dynamic_query_stream.DynamicQueryStream.get_fields_metadata"
+        )
+
+        mock_get_fields_metadata = patcher.start()
+        mock_get_fields_metadata.side_effect = lambda fields: {
+            f: {
+                "name": f,
+                "dataType": "STRING",
+            }
+            for f in fields
+        }
+
+        self.addCleanup(patcher.stop)
+
     def test_base_credentials_discovery(self):
         """Test basic discover sync with Bearer Token"""
 
         catalog = TapGoogleAds(config=self.mock_config).discover_streams()
 
         # expect valid catalog to be discovered
-        self.assertEqual(len(catalog), 11, "Total streams from default catalog")
+        self.assertEqual(len(catalog), 28, "Total streams from default catalog")
 
     @responses.activate
     def test_googleads_sync_accessible_customers(self):
         """Test sync."""
 
         tap = test_utils.set_up_tap_with_custom_catalog(
-            self.mock_config, ["stream_accessible_customers"]
+            self.mock_config, ["accessible_customers"]
         )
 
         responses.add(
@@ -54,14 +70,14 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            "https://googleads.googleapis.com/v18/customers:listAccessibleCustomers",
+            "https://googleads.googleapis.com/v20/customers:listAccessibleCustomers",
             json=test_utils.accessible_customer_return_data,
             status=200,
         )
 
         tap.sync_all()
 
-        self.assertEqual(len(test_utils.SINGER_MESSAGES), 15)
+        self.assertEqual(len(test_utils.SINGER_MESSAGES), 32)
         self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.StateMessage)
         self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.SchemaMessage)
         self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.RecordMessage)

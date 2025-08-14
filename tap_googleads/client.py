@@ -6,6 +6,7 @@ from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
+
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
@@ -21,7 +22,7 @@ class ResumableAPIError(Exception):
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v18"
+    url_base = "https://googleads.googleapis.com/v20"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
@@ -127,9 +128,10 @@ class GoogleAdsStream(RESTStream):
         params: dict = {}
         if next_page_token:
             params["pageToken"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+        # TODO: This doesn't appear to be valid params, need to look-into this further
+        # if self.replication_key:
+        #     params["sort"] = "asc"
+        #     params["order_by"] = self.replication_key
         return params
 
     def get_records(self, context):
