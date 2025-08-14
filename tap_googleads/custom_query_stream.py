@@ -6,7 +6,6 @@ from tap_googleads.dynamic_query_stream import DynamicQueryStream
 class CustomQueryStream(DynamicQueryStream):
     """Define custom stream."""
 
-    records_jsonpath = "$[*].results[*]"
     add_date_filter_to_query = True
 
     def __init__(self, *args, **kwargs) -> None:
