@@ -142,12 +142,13 @@ class GoogleAdsStream(RESTStream):
             self.logger.warning(e)
 
     @property
-    def gaql(self):
+    def gaql(self) -> str:
         raise NotImplementedError
 
     def prepare_request_payload(self, context, next_page_token):
         if self.rest_method == "POST":
-            return {"query": self.gaql}
+            santised_query = " ".join(self.gaql.split())
+            return {"query": santised_query}
 
         return None
 
