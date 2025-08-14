@@ -23,6 +23,7 @@ class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
     url_base = "https://googleads.googleapis.com/v20"
+    path = "/customers/{customer_id}/googleAds:search"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
@@ -144,11 +145,11 @@ class GoogleAdsStream(RESTStream):
     def gaql(self):
         raise NotImplementedError
 
-    @property
-    def path(self) -> str:
-        # Paramas
-        path = "/customers/{customer_id}/googleAds:search?query="
-        return path + self.gaql
+    def prepare_request_payload(self, context, next_page_token):
+        if self.rest_method == "POST":
+            return {"query": self.gaql}
+
+        return None
 
     @cached_property
     def start_date(self):
