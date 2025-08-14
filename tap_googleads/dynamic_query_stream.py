@@ -18,7 +18,7 @@ DATE_TYPES = ("segments.date", "segments.month", "segments.quarter", "segments.w
 class DynamicQueryStream(ReportsStream):
     """Define dynamic query stream class."""
 
-    records_jsonpath = "$.results[*]"
+    records_jsonpath = "$[*].results[*]"
     add_date_filter_to_query = False
 
     @staticmethod
