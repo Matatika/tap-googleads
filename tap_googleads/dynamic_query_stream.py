@@ -102,7 +102,6 @@ class DynamicQueryStream(ReportsStream):
 
         payload = {"query": query, "pageSize": len(fields)}
         headers = {
-            "Authorization": f"Bearer {self.authenticator.access_token}",
             "Content-Type": "application/json",
             "developer-token": self.config["developer_token"],
         }
