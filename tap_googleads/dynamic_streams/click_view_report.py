@@ -208,10 +208,24 @@ class ClickViewReportStream(DynamicQueryStream):
             
     def validate_response(self, response):
         if response.status_code == HTTPStatus.FORBIDDEN:
-            error = response.json()["error"]["details"][0]["errors"][0]
+            try:
+                data = response.json()
+            except ValueError:
+                data = None
+
+            error_msg = None
+            if isinstance(data, dict) and "error" in data:
+                try:
+                    error_obj = data["error"]["details"][0]["errors"][0]
+                    error_msg = error_obj.get("message", str(error_obj))
+                except (KeyError, IndexError, TypeError):
+                    error_msg = str(data["error"])
+            else:
+                error_msg = "Unexpected 403 response format"
+
             msg = (
-                "Click view report not accessible to customer "
-                f"'{self.context['customer_id']}': {error['message']}"
+                f"Click view report not accessible to customer "
+                f"'{self.context.get('customer_id', 'unknown')}': {error_msg}"
             )
             raise ResumableAPIError(msg, response)
 
