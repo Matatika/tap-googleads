@@ -64,7 +64,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
     know when to query the down stream apps
     """
 
-    records_jsonpath = "$[*].results[*]"
+    records_jsonpath = "$.results[*]"
     name = "customer_hierarchy"
     primary_keys = ["customerClient__id"]
     parent_stream_type = AccessibleCustomers
