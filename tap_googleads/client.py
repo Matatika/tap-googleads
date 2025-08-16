@@ -23,7 +23,7 @@ class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
     url_base = "https://googleads.googleapis.com/v20"
-    path = "/customers/{customer_id}/googleAds:search"
+    path = "/customers/{customer_id}/googleAds:searchStream"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
