@@ -32,14 +32,7 @@ class DynamicQueryStream(ReportsStream):
             timeout=self.timeout,
             allow_redirects=self.allow_redirects,
         )
-        self._write_request_duration_log(
-            endpoint=self.path,
-            response=response,
-            context=context,
-            extra_tags={"url": prepared_request.path_url}
-            if self._LOG_REQUEST_METRIC_URLS
-            else None,
-        )
+
         self.validate_response(response)
         self.logger.debug("Streaming response received successfully.")
         return response
