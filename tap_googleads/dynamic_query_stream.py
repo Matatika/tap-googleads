@@ -5,10 +5,12 @@ from functools import cached_property
 from typing import Any, Dict, List
 
 import humps
+import ijson
 import requests
 import sqlparse
 from singer_sdk.exceptions import FatalAPIError
 from singer_sdk.helpers._flattening import flatten_record
+from singer_sdk.pagination import SinglePagePaginator
 
 from tap_googleads.streams import ReportsStream
 
@@ -18,8 +20,29 @@ DATE_TYPES = ("segments.date", "segments.month", "segments.quarter", "segments.w
 class DynamicQueryStream(ReportsStream):
     """Define dynamic query stream class."""
 
-    records_jsonpath = "$.results[*]"
     add_date_filter_to_query = False
+
+    def get_new_paginator(self):
+        return SinglePagePaginator()
+
+    def _request(self, prepared_request, context):
+        response = self.requests_session.send(
+            prepared_request,
+            stream=True,
+            timeout=self.timeout,
+            allow_redirects=self.allow_redirects,
+        )
+
+        self.validate_response(response)
+        self.logger.debug("Streaming response received successfully.")
+        return response
+
+    def parse_response(self, response):
+        with response:
+            response.raw.decode_content = True
+
+            for batch in ijson.items(response.raw, "item"):
+                yield from batch.get("results", [])
 
     @staticmethod
     def add_date_filter(fields, has_where_clause, query):
