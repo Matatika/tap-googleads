@@ -161,16 +161,11 @@ class GoogleAdsStream(RESTStream):
         return datetime.fromisoformat(self.config["end_date"]).strftime(r"'%Y-%m-%d'")
 
     @cached_property
-    def customer_ids(self):
+    def customer_ids(self) -> list[str] | None:
         customer_ids = self.config.get("customer_ids")
-        customer_id = self.config.get("customer_id")
 
-        if customer_ids is None:
-            if customer_id is None:
-                return
-            customer_ids = [customer_id]
-
-        return list(map(_sanitise_customer_id, customer_ids))
+        if customer_ids is not None:
+            return list(map(_sanitise_customer_id, customer_ids))
 
     @cached_property
     def login_customer_id(self):

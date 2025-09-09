@@ -49,7 +49,6 @@ Required settings:
 Optional settings:
 
 - `customer_ids`
-- `customer_id`
 - `login_customer_id`
 - `start_date` (default: 90 days before the current date)
 - `end_date` (default: the current date)
@@ -57,8 +56,8 @@ Optional settings:
 
 Config for settings that refer to a customer ID should be provided as a string comprising of 10 numeric characters (e.g. `123-456-7890` or `1234567890`).
 
-#### `customer_ids`/`customer_id`
-If `customer_ids` is provided, the tap will sync get data for the corrsponding customer accounts only. The same is true for `customer_id` but for a single customer account. If both are provided, `customer_ids` takes precedence. If neither are provided, all customer accounts available to the authenticated principal are synced. 
+#### `customer_ids`
+If `customer_ids` is provided, the tap will sync get data for the corrsponding customer accounts only. If its not provided, all customer accounts available to the authenticated principal are synced. 
 
 #### `login_customer_id`
 If authenticated as a manager account, `login_customer_id` should be set to the customer ID of the manager account.
@@ -69,7 +68,7 @@ To run the tap yourself It is highly recommended to use the [Using Your Own Cred
 
 These settings for handling your credentials through a Proxy OAuth Server, these settings are used by default in a [Matatika](https://www.matatika.com/) workspace.
 
-The benefit to using these settings in your [Matatika](https://www.matatika.com/) workspace is that you do not have to get or provide any of the OAuth credentials. All a user needs to do it allow the Matatika App permissions to access your GoogleAds data, and choose what `customer_id` you want to get data from.
+The benefit to using these settings in your [Matatika](https://www.matatika.com/) workspace is that you do not have to get or provide any of the OAuth credentials. All a user needs to do it allow the Matatika App permissions to access your GoogleAds data, and choose what `customer_id(s)` you want to get data from.
 
 All you need to provide in your [Matatika](https://www.matatika.com/) workspace are:
 - Permissions for our app to access your google account through an OAuth screen
