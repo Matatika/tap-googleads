@@ -15,6 +15,7 @@ requests = "^2.25.1"
 singer-sdk = "0.42.1"
 sqlparse = "^0.5.3"
 pyhumps = "^3.8.0"
+ijson = "<3.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.5"
