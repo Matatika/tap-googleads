@@ -169,7 +169,7 @@ class GoogleAdsStream(RESTStream):
                 return
             customer_ids = [customer_id]
 
-        return list(map(_sanitise_customer_id, customer_ids))
+        return {_sanitise_customer_id(c) for c in customer_ids}
 
     @cached_property
     def login_customer_id(self):
