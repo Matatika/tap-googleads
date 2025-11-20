@@ -64,6 +64,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
     know when to query the down stream apps
     """
 
+    path = "/customers/{customer_id}/googleAds:search"
     records_jsonpath = "$.results[*]"
     name = "customer_hierarchy"
     primary_keys = ["customerClient__id"]
@@ -146,4 +147,6 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
 class ReportsStream(GoogleAdsStream):
     """Base class for all report streams."""
+
     parent_stream_type = CustomerHierarchyStream
+    path = "/customers/{customer_id}/googleAds:searchStream"
