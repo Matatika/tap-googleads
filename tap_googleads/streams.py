@@ -130,12 +130,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
         customer = record["customerClient"]
 
         if customer["manager"]:
-            self.logger.warning(f"{customer['clientCustomer']} is a manager, skipping")
+            self.logger.warning("%s is a manager, skipping", customer["clientCustomer"])
             return
 
         if customer["status"] != "ENABLED":
             self.logger.warning(
-                f"{customer['clientCustomer']} is not enabled, skipping"
+                "%s is not enabled, skipping",
+                customer["clientCustomer"],
             )
             return
 
