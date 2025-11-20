@@ -109,6 +109,19 @@ class CustomerHierarchyStream(GoogleAdsStream):
             msg = self.response_error_message(response)
             raise ResumableAPIError(msg, response)
 
+    def post_process(self, row, context=None):
+        row = super().post_process(row, context)
+        customer = row["customerClient"]
+
+        if self.customer_ids and customer["id"] not in self.customer_ids:
+            self.logger.info(
+                "%s not present in customer_id(s) config, skipping",
+                customer["clientCustomer"],
+            )
+            return None
+
+        return row
+
     def generate_child_contexts(
             self,
             record: Record,
