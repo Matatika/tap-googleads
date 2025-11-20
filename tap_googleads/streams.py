@@ -127,34 +127,34 @@ class CustomerHierarchyStream(GoogleAdsStream):
             record: Record,
             context: Context | None,
     ) -> Iterable[Context | None]:
-        customer_ids = self.customer_ids
+        customer = record["customerClient"]
 
-        if customer_ids is None:
-            customer = record['customerClient']
+        if customer["manager"]:
+            self.logger.warning(f"{customer['clientCustomer']} is a manager, skipping")
+            return
 
-            if customer['manager']:
-                self.logger.warning(f"{customer['clientCustomer']} is a manager, skipping")
-                return
-
-            if customer['status'] != 'ENABLED':
-                self.logger.warning(f"{customer['clientCustomer']} is not enabled, skipping")
-                return
-
-            customer_ids = {customer['id']}
+        if customer["status"] != "ENABLED":
+            self.logger.warning(
+                f"{customer['clientCustomer']} is not enabled, skipping"
+            )
+            return
 
         # sync only customers we haven't seen
-        customer_ids = set(customer_ids) - self.seen_customer_ids
 
-        for customer_id in customer_ids:
-            customer_context = {"customer_id": customer_id}
+        customer_id = customer["id"]
 
-            # Add parent manager account id if this is a child
-            if customer_id != context['customer_id']:
-                customer_context['parent_customer_id'] = context['customer_id']
+        if customer_id in self.seen_customer_ids:
+            return
 
-            yield customer_context
+        customer_context = {"customer_id": customer_id}
 
-        self.seen_customer_ids.update(customer_ids)
+        # Add parent manager account id if this is a child
+        if customer_id != context["customer_id"]:
+            customer_context["parent_customer_id"] = context["customer_id"]
+
+        yield customer_context
+
+        self.seen_customer_ids.add(customer_id)
 
 
 class ReportsStream(GoogleAdsStream):
