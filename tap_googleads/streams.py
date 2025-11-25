@@ -135,6 +135,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
     def post_process(self, row, context=None):
         row = super().post_process(row, context)
         customer = row["customerClient"]
+        customer_id = customer["id"]
+
+        # sync only customers we haven't seen
+        if customer_id in self.seen_customer_ids:
+            return None
+
+        self.seen_customer_ids.add(customer_id)
 
         if self.customer_ids and customer["id"] not in self.customer_ids:
             self.skipped_customer_ids[SkippedReason.NOT_IN_CONFIG].append(
