@@ -101,7 +101,6 @@ class CustomerHierarchyStream(GoogleAdsStream):
                       customer_client.time_zone,
                       customer_client.id
                FROM customer_client
-               WHERE customer_client.level <= 1 \
                """
 
     def validate_response(self, response):
