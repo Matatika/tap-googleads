@@ -159,12 +159,6 @@ class CustomerHierarchyStream(GoogleAdsStream):
         customer = record["customerClient"]
         customer_id = customer["id"]
 
-        # sync only customers we haven't seen
-        if customer_id in self.seen_customer_ids:
-            return
-
-        self.seen_customer_ids.add(customer_id)
-
         if customer["manager"]:
             self.skipped_customer_ids[SkippedReason.MANAGER_ACCOUNT].append(customer_id)
             return
