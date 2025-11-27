@@ -6,7 +6,6 @@ from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
-
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
@@ -154,7 +153,12 @@ class GoogleAdsStream(RESTStream):
 
     @cached_property
     def start_date(self):
-        return datetime.fromisoformat(self.config["start_date"]).strftime(r"'%Y-%m-%d'")
+        start_value = (
+            self.get_starting_replication_key_value(self.context)
+            or self.config["start_date"]
+        )
+
+        return datetime.fromisoformat(start_value).strftime(r"'%Y-%m-%d'")
 
     @cached_property
     def end_date(self):
