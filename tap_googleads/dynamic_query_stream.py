@@ -56,21 +56,16 @@ class DynamicQueryStream(ReportsStream):
         if hasattr(self, "_date_filter_applied") and self._date_filter_applied:
             return
 
-        start_date = self.get_starting_replication_key_value(context)
-        if not start_date:
-            start_date = self.start_date
-        else:
-            start_date = f"'{start_date}'"
         query = self.gaql
         if "WHERE" in query.upper():
             self.gaql = (
                 query.rstrip()
-                + f" AND segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+                + f" AND segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
             )
         else:
             self.gaql = (
                 query.rstrip()
-                + f" WHERE segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+                + f" WHERE segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
             )
 
         self._date_filter_applied = True
