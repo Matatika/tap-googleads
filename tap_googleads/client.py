@@ -21,12 +21,15 @@ class ResumableAPIError(Exception):
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v22"
     path = "/customers/{customer_id}/googleAds:search"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
     _LOG_REQUEST_METRIC_URLS: bool = True
+
+    @cached_property
+    def url_base(self):
+        return f'https://googleads.googleapis.com/{self.config["api_version"]}'
 
     def response_error_message(self, response: requests.Response) -> str:
         """Build error message for invalid http statuses.
@@ -115,9 +118,7 @@ class GoogleAdsStream(RESTStream):
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
         headers["login-customer-id"] = (
-            self.login_customer_id
-            or self.context
-            and self.context.get("customer_id")
+            self.login_customer_id or self.context and self.context.get("customer_id")
         )
         return headers
 
