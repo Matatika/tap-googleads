@@ -141,7 +141,7 @@ class DynamicQueryStream(ReportsStream):
         try:
             query_object = sqlparse.parse(self.gaql)[0]
         except ValueError:
-            message = f"The GAQL query {self.name} failed. Validate your GAQL query with the Google Ads query validator. https://developers.google.com/google-ads/api/fields/v20/query_validator"
+            message = f"The GAQL query {self.name} failed. Validate your GAQL query with the Google Ads query validator. https://developers.google.com/google-ads/api/fields/v22/query_validator"
             raise ValueError(message)
 
         fields = []
