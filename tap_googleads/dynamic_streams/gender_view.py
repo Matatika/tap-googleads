@@ -17,7 +17,7 @@ class GenderViewStream(DynamicQueryStream):
           customer.time_zone, 
           campaign.id, 
           segments.device, 
-          metrics.video_view_rate, 
+          metrics.video_trueview_view_rate, 
           ad_group.name, 
           metrics.clicks, 
           ad_group_criterion.criterion_id, 
@@ -35,7 +35,7 @@ class GenderViewStream(DynamicQueryStream):
           metrics.video_quartile_p100_rate, 
           metrics.all_conversions_value, 
           campaign.name, 
-          metrics.video_views, 
+          metrics.video_trueview_views, 
           customer.descriptive_name, 
           campaign.status, 
           metrics.cost_micros 

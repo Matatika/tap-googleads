@@ -113,7 +113,18 @@ class DynamicQueryStream(ReportsStream):
             raise FatalAPIError(msg)
 
         response_data = response.json()
-        return {item.get("name"): item for item in response_data.get("results", [])}
+        fields_metadata = {item.get("name"): item for item in response_data.get("results", [])}
+
+        unrecognised_fields = sorted(set(fields) - fields_metadata.keys())
+
+        if not unrecognised_fields:
+            return fields_metadata
+
+        msg = f"Unrecognised fields: {unrecognised_fields}"
+        self.logger.error(msg)
+        self.logger.error("Check Google Ads API version changes here: https://developers.google.com/google-ads/api/docs/upgrade")
+
+        raise RuntimeError(msg)
 
     @cached_property
     def schema(self) -> dict:
@@ -159,7 +170,7 @@ class DynamicQueryStream(ReportsStream):
 
         for field in fields:
             node = google_schema[field]
-            google_data_type = node.get("dataType", "")
+            google_data_type = node.get("dataType")
             field_value = {
                 "type": [
                     google_datatype_mapping.get(google_data_type, "string"),
