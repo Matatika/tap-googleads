@@ -79,21 +79,16 @@ class DynamicQueryStream(ReportsStream):
         if hasattr(self, "_date_filter_applied") and self._date_filter_applied:
             return
 
-        start_date = self.get_starting_replication_key_value(context)
-        if not start_date:
-            start_date = self.start_date
-        else:
-            start_date = f"'{start_date}'"
         query = self.gaql
         if "WHERE" in query.upper():
             self.gaql = (
                 query.rstrip()
-                + f" AND segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+                + f" AND segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
             )
         else:
             self.gaql = (
                 query.rstrip()
-                + f" WHERE segments.date >= {start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+                + f" WHERE segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
             )
 
         self._date_filter_applied = True
@@ -169,7 +164,7 @@ class DynamicQueryStream(ReportsStream):
         try:
             query_object = sqlparse.parse(self.gaql)[0]
         except ValueError:
-            message = f"The GAQL query {self.name} failed. Validate your GAQL query with the Google Ads query validator. https://developers.google.com/google-ads/api/fields/v20/query_validator"
+            message = f"The GAQL query {self.name} failed. Validate your GAQL query with the Google Ads query validator. https://developers.google.com/google-ads/api/fields/v22/query_validator"
             raise ValueError(message)
 
         fields = []
