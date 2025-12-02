@@ -21,7 +21,7 @@ class ResumableAPIError(Exception):
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v20"
+    url_base = "https://googleads.googleapis.com/v22"
     path = "/customers/{customer_id}/googleAds:search"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
