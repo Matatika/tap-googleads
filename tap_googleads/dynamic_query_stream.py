@@ -158,8 +158,8 @@ class DynamicQueryStream(ReportsStream):
         google_schema = self.get_fields_metadata(fields)
 
         for field in fields:
-            node = google_schema[field]
-            google_data_type = node.get("dataType", "")
+            node = google_schema.get(field, {})
+            google_data_type = node.get("dataType")
             field_value = {
                 "type": [
                     google_datatype_mapping.get(google_data_type, "string"),
