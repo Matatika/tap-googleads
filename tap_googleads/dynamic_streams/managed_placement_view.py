@@ -45,7 +45,7 @@ class ManagedPlacementViewStream(DynamicQueryStream):
           metrics.gmail_saves, 
           metrics.all_conversions_value, 
           campaign.name, 
-          metrics.video_views, 
+          metrics.video_trueview_views, 
           customer.descriptive_name, 
           campaign.status, 
           metrics.gmail_secondary_clicks, 
