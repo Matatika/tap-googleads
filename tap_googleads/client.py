@@ -11,6 +11,19 @@ from singer_sdk.streams import RESTStream
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
 
+# remove old versions once they have been sunset
+# https://developers.google.com/google-ads/api/docs/sunset-dates#timetable
+VERSION_RENAMES = {
+    "v22": {
+        "average_cpv": "trueview_average_cpv",
+        "video_view_rate": "video_trueview_view_rate",
+        "video_views": "video_trueview_views",
+        "video_view_rate_in_feed": "video_trueview_view_rate_in_feed",
+        "video_view_rate_in_stream": "video_trueview_view_rate_in_stream",
+        "video_view_rate_shorts": "video_trueview_view_rate_shorts",
+    }
+}
+
 
 class ResumableAPIError(Exception):
     def __init__(self, message: str, response: requests.Response) -> None:
@@ -145,9 +158,20 @@ class GoogleAdsStream(RESTStream):
     def gaql(self) -> str:
         raise NotImplementedError
 
+    @property
+    def versioned_gaql(self) -> str:
+        gaql = self.gaql
+
+        for version, renames in VERSION_RENAMES.items():
+            if self.config["api_version"] < version:
+                for old, new in renames.items():
+                    gaql = gaql.replace(new, old)
+
+        return gaql
+
     def prepare_request_payload(self, context, next_page_token):
         if self.rest_method == "POST":
-            santised_query = " ".join(self.gaql.split())
+            santised_query = " ".join(self.versioned_gaql.split())
             return {"query": santised_query}
 
         return None
