@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import datetime
+import itertools
 from functools import cached_property
-from http import HTTPStatus
 
 from singer_sdk import typing as th
 
-from tap_googleads.client import ResumableAPIError
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -99,9 +98,12 @@ class ClickViewReportStream(DynamicQueryStream):
         for self.date in dates:
             self.logger.info(f"Requesting records for date: {self.date} | customer_id: {context.get('customer_id')}")
             records = super().request_records(context)
+            record = next(records, None)
 
-            if not records:
+            if not record:
                 self._increment_stream_state(
                     {"date": self.date.isoformat()}, context=self.context
                 )
-            yield from records
+                continue
+
+            yield from itertools.chain([record], records)
