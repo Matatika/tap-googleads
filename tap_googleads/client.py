@@ -175,7 +175,7 @@ class GoogleAdsStream(RESTStream):
 
         return None
 
-    @cached_property
+    @property
     def start_date(self):
         start_value = (
             self.get_starting_replication_key_value(self.context)
