@@ -65,11 +65,10 @@ class DynamicQueryStream(ReportsStream):
     @property
     def gaql(self):
         """Return the GAQL query."""
-        gaql = self._get_gaql()
+        return self._get_gaql()
 
-        if not self.add_date_filter_to_query:
-            return gaql
-
+    def _apply_date_filter_to_query(self, gaql: str):
+        """Apply date filter to the query at request time."""
         if "WHERE" in gaql.upper():
             return (
                 gaql.rstrip()
@@ -240,3 +239,15 @@ class DynamicQueryStream(ReportsStream):
             flattened_row[key] = self._cast_value(key, value)
 
         return flattened_row
+
+    def prepare_request_payload(self, context, next_page_token):
+        if self.rest_method != "POST":
+            return None
+
+        gaql = self.versioned_gaql
+
+        if self.add_date_filter_to_query:
+            gaql = self._apply_date_filter_to_query(gaql)
+
+        santised_query = " ".join(gaql.split())
+        return {"query": santised_query}

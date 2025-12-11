@@ -31,5 +31,6 @@ class CustomQueryStream(DynamicQueryStream):
         self._primary_keys = self._custom_query.get("primary_keys", [])
         self._replication_method = self._custom_query.get("replication_method")
 
-    def _get_gaql(self):
+    @property
+    def gaql(self):
         return self._gaql
