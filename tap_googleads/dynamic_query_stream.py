@@ -58,40 +58,27 @@ class DynamicQueryStream(ReportsStream):
                 return int(value)
         return value
 
-    def _get_gaql(self):
+    def _get_gaql(self) -> str:
         """Return the base GAQL query. Override this in subclasses."""
         raise NotImplementedError
 
     @property
     def gaql(self):
         """Return the GAQL query."""
-        if not hasattr(self, "_gaql"):
-            self._gaql = self._get_gaql()
-        return self._gaql
+        return self._get_gaql()
 
-    @gaql.setter
-    def gaql(self, value):
-        """Set the GAQL query."""
-        self._gaql = value
-
-    def _apply_date_filter_to_query(self, context):
+    def _apply_date_filter_to_query(self, gaql: str):
         """Apply date filter to the query at request time."""
-        if hasattr(self, "_date_filter_applied") and self._date_filter_applied:
-            return
-
-        query = self.gaql
-        if "WHERE" in query.upper():
-            self.gaql = (
-                query.rstrip()
+        if "WHERE" in gaql.upper():
+            return (
+                gaql.rstrip()
                 + f" AND segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
             )
-        else:
-            self.gaql = (
-                query.rstrip()
-                + f" WHERE segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
-            )
 
-        self._date_filter_applied = True
+        return (
+            gaql.rstrip()
+            + f" WHERE segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
+        )
 
     def get_fields_metadata(self, fields: List[str]) -> Dict[str, Dict[str, Any]]:
         """
@@ -253,10 +240,14 @@ class DynamicQueryStream(ReportsStream):
 
         return flattened_row
 
-    def prepare_request(self, context, next_page_token):
-        """Prepare a request object for the API call."""
+    def prepare_request_payload(self, context, next_page_token):
+        if self.rest_method != "POST":
+            return None
+
+        gaql = self.versioned_gaql
+
         if self.add_date_filter_to_query:
-            self._apply_date_filter_to_query(context)
+            gaql = self._apply_date_filter_to_query(gaql)
 
-        return super().prepare_request(context, next_page_token)
-
+        santised_query = " ".join(gaql.split())
+        return {"query": santised_query}

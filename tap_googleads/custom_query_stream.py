@@ -34,7 +34,3 @@ class CustomQueryStream(DynamicQueryStream):
     @property
     def gaql(self):
         return self._gaql
-
-    @gaql.setter
-    def gaql(self, value):
-        self._gaql = value
