@@ -22,6 +22,10 @@ class DynamicQueryStream(ReportsStream):
 
     add_date_filter_to_query = False
 
+    @cached_property
+    def is_sorted(self):
+        return self.add_date_filter_to_query
+
     def get_new_paginator(self):
         return SinglePagePaginator()
 
