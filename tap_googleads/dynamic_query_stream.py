@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import fnmatch
 from functools import cached_property
 from typing import Any, Dict, List
@@ -19,11 +20,12 @@ class DynamicQueryStream(ReportsStream):
     """Define dynamic query stream class."""
 
     records_jsonpath = "$.results[*]"
-    add_date_filter_to_query = False
+    date_filter_mode = "none"
+    request_date: str | None = None
 
     @cached_property
     def is_sorted(self):
-        return self.add_date_filter_to_query
+        return self.date_filter_mode != "none"
 
     @staticmethod
     def add_date_filter(fields, has_where_clause, query):
@@ -50,6 +52,23 @@ class DynamicQueryStream(ReportsStream):
 
     def _apply_date_filter_to_query(self, gaql: str):
         """Apply date filter to the query at request time."""
+        if self.date_filter_mode == "single_day":
+            if self.request_date is None:
+                raise ValueError(
+                    f"Request date not set for single_day query stream '{self.name}'."
+                )
+
+            if "WHERE" in gaql.upper():
+                return (
+                    gaql.rstrip()
+                    + f" AND segments.date = '{self.request_date}' ORDER BY segments.date ASC"
+                )
+
+            return (
+                gaql.rstrip()
+                + f" WHERE segments.date = '{self.request_date}' ORDER BY segments.date ASC"
+            )
+
         if "WHERE" in gaql.upper():
             return (
                 gaql.rstrip()
@@ -154,7 +173,7 @@ class DynamicQueryStream(ReportsStream):
             if isinstance(token, sqlparse.sql.Where):
                 has_where_clause = True
 
-        if self.add_date_filter_to_query:
+        if self.date_filter_mode != "none":
             self.add_date_filter(fields, has_where_clause, query_object)
 
         google_schema = self.get_fields_metadata(fields)
@@ -227,8 +246,20 @@ class DynamicQueryStream(ReportsStream):
 
         gaql = self.versioned_gaql
 
-        if self.add_date_filter_to_query:
+        if self.date_filter_mode != "none":
             gaql = self._apply_date_filter_to_query(gaql)
 
         santised_query = " ".join(gaql.split())
         return {"query": santised_query}
+
+    def iter_request_dates(self, context):
+        """Yield dates to query for single_day streams."""
+        start_value = self.get_starting_replication_key_value(context) or self.config[
+            "start_date"
+        ]
+        start_date = datetime.date.fromisoformat(start_value)
+        end_date = datetime.date.fromisoformat(self.config["end_date"])
+        delta = (end_date - start_date).days
+
+        for offset in range(delta + 1):
+            yield start_date + datetime.timedelta(days=offset)
