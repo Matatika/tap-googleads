@@ -21,7 +21,16 @@ class DynamicQueryStream(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     date_filter_mode = "none"
+    add_date_filter_to_query = False
     request_date: str | None = None
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        # Backward compatibility for built-in streams that still declare the legacy
+        # boolean flag instead of setting date_filter_mode explicitly.
+        if self.date_filter_mode == "none" and self.add_date_filter_to_query:
+            self.date_filter_mode = "range"
 
     @cached_property
     def is_sorted(self):
