@@ -21,11 +21,13 @@ class GeotargetsStream(DynamicQueryStream):
         geo_target_constant.id,
         geo_target_constant.name,
         geo_target_constant.status,
-        geo_target_constant.target_type
+        geo_target_constant.target_type,
+        geo_target_constant.parent_geo_target
     FROM geo_target_constant
     """
     name = "geo_target_constant"
     primary_keys = ["geoTargetConstant__id"]
+
 
     def get_records(self, context: Context) -> Iterable[Dict[str, Any]]:
         """Return a generator of record-type dictionary objects.
