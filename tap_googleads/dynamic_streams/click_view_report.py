@@ -16,6 +16,8 @@ class ClickViewReportStream(DynamicQueryStream):
 
     date: datetime.date
 
+    add_date_filter_to_query = True
+
     def __init__(self, *args, **kwargs) -> None:
         self.date = datetime.date.today() - datetime.timedelta(days=1)
         super().__init__(*args, **kwargs)
@@ -23,7 +25,7 @@ class ClickViewReportStream(DynamicQueryStream):
     @property
     def gaql(self):
 
-        return f"""
+        return """
         SELECT
           click_view.gclid,
           segments.date,
@@ -41,7 +43,6 @@ class ClickViewReportStream(DynamicQueryStream):
           click_view.keyword,
           click_view.keyword_info.match_type
         FROM click_view
-        WHERE segments.date = '{self.date.isoformat()}'
         """
 
     @cached_property
@@ -107,3 +108,11 @@ class ClickViewReportStream(DynamicQueryStream):
                 continue
 
             yield from itertools.chain([record], records)
+
+    def _apply_date_filter_to_query(self, gaql):
+        clause = "AND" if "WHERE" in gaql.upper() else "WHERE"
+
+        return (
+            gaql.rstrip()
+            + f" {clause} segments.date = '{self.date.isoformat()}' ORDER BY segments.date ASC"
+        )
