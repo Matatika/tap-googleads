@@ -58,7 +58,7 @@ class ClickViewReportStream(DynamicQueryStream):
     replication_key = "date"
 
     def post_process(self, row, context):
-        row["date"] = row["segments"].pop("date")
+        row["date"] = row["segments"]["date"]
 
         if row.get("clickView", {}).get("keyword") is None:
             row["clickView"]["keyword"] = "UNSPECIFIED"
