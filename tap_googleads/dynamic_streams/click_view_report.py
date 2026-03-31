@@ -103,7 +103,7 @@ class ClickViewReportStream(DynamicQueryStream):
 
             if not record:
                 self._increment_stream_state(
-                    {"date": self.date.isoformat()}, context=self.context
+                    {self.replication_key: self.date.isoformat()}, context=self.context
                 )
                 continue
 
