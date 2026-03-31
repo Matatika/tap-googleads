@@ -85,7 +85,7 @@ class ClickViewReportStream(DynamicQueryStream):
     def request_records(self, context):
 
         ninety_days_ago = datetime.date.today() - datetime.timedelta(days=90)
-        start_value = datetime.date.fromisoformat(self.get_starting_replication_key_value(context))#context.get("bookmarks", {}).get(self.name, {}).get(self.replication_key)#self.get_starting_replication_key_value(context)
+        start_value = datetime.date.fromisoformat(self.get_starting_replication_key_value(context) or self.config["start_date"])
         if start_value < ninety_days_ago:
             start_date = ninety_days_ago
         else:
