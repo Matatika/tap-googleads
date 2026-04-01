@@ -6,11 +6,23 @@ from http import HTTPStatus
 from typing import Any, Dict, Optional
 
 import requests
-
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
+
+# remove old versions once they have been sunset
+# https://developers.google.com/google-ads/api/docs/sunset-dates#timetable
+VERSION_RENAMES = {
+    "v22": {
+        "average_cpv": "trueview_average_cpv",
+        "video_view_rate": "video_trueview_view_rate",
+        "video_views": "video_trueview_views",
+        "video_view_rate_in_feed": "video_trueview_view_rate_in_feed",
+        "video_view_rate_in_stream": "video_trueview_view_rate_in_stream",
+        "video_view_rate_shorts": "video_trueview_view_rate_shorts",
+    }
+}
 
 
 class ResumableAPIError(Exception):
@@ -22,12 +34,15 @@ class ResumableAPIError(Exception):
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v20"
     path = "/customers/{customer_id}/googleAds:search"
     rest_method = "POST"
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
     _LOG_REQUEST_METRIC_URLS: bool = True
+
+    @cached_property
+    def url_base(self):
+        return f'https://googleads.googleapis.com/{self.config["api_version"]}'
 
     def response_error_message(self, response: requests.Response) -> str:
         """Build error message for invalid http statuses.
@@ -116,9 +131,7 @@ class GoogleAdsStream(RESTStream):
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
         headers["login-customer-id"] = (
-            self.login_customer_id
-            or self.context
-            and self.context.get("customer_id")
+            self.login_customer_id or self.context and self.context.get("customer_id")
         )
         return headers
 
@@ -145,16 +158,32 @@ class GoogleAdsStream(RESTStream):
     def gaql(self) -> str:
         raise NotImplementedError
 
+    @property
+    def versioned_gaql(self) -> str:
+        gaql = self.gaql
+
+        for version, renames in VERSION_RENAMES.items():
+            if self.config["api_version"] < version:
+                for old, new in renames.items():
+                    gaql = gaql.replace(new, old)
+
+        return gaql
+
     def prepare_request_payload(self, context, next_page_token):
         if self.rest_method == "POST":
-            santised_query = " ".join(self.gaql.split())
+            santised_query = " ".join(self.versioned_gaql.split())
             return {"query": santised_query}
 
         return None
 
-    @cached_property
+    @property
     def start_date(self):
-        return datetime.fromisoformat(self.config["start_date"]).strftime(r"'%Y-%m-%d'")
+        start_value = (
+            self.get_starting_replication_key_value(self.context)
+            or self.config["start_date"]
+        )
+
+        return datetime.fromisoformat(start_value).strftime(r"'%Y-%m-%d'")
 
     @cached_property
     def end_date(self):
@@ -170,7 +199,7 @@ class GoogleAdsStream(RESTStream):
                 return
             customer_ids = [customer_id]
 
-        return list(map(_sanitise_customer_id, customer_ids))
+        return {_sanitise_customer_id(c) for c in customer_ids}
 
     @cached_property
     def login_customer_id(self):

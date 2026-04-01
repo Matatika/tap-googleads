@@ -42,7 +42,7 @@ class CampaignBudgetStream(DynamicQueryStream):
           metrics.average_cpc,
           metrics.average_cpe,
           metrics.average_cpm,
-          metrics.average_cpv,
+          metrics.trueview_average_cpv,
           metrics.clicks,
           metrics.conversions,
           metrics.conversions_from_interactions_rate,
@@ -60,8 +60,8 @@ class CampaignBudgetStream(DynamicQueryStream):
           metrics.interactions,
           metrics.value_per_all_conversions,
           metrics.value_per_conversion,
-          metrics.video_view_rate,
-          metrics.video_views,
+          metrics.video_trueview_view_rate,
+          metrics.video_trueview_views,
           metrics.view_through_conversions
         FROM campaign_budget
         WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}

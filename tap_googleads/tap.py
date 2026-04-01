@@ -202,6 +202,12 @@ class TapGoogleAds(Tap):
             description="A list of custom queries to run. Each query will be assigned a stream with the name specified in the `name` field.",
             default=[],
         ),
+        th.Property(
+            "api_version",
+            th.StringType,
+            description="API version to use - see [versioning](https://developers.google.com/google-ads/api/docs/concepts/versioning) and [release notes](https://developers.google.com/google-ads/api/docs/release-notes)/[upgrade your API version](https://developers.google.com/google-ads/api/docs/upgrade).",
+            default="v22",  # https://developers.google.com/google-ads/api/docs/release-notes#v22_2025-10-15
+        ),
     ).to_dict()
 
     def setup_mapper(self):
@@ -215,9 +221,20 @@ class TapGoogleAds(Tap):
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         if self.config["enable_click_view_report_stream"]:
             streams.append(ClickViewReportStream(tap=self))
-        streams.extend(
-            CustomQueryStream(tap=self, custom_query=q)
-            for q in self.config["custom_queries"]
-        )
+
+        if not self.config["custom_queries"]:
+            return streams
+
+        class _CustomClickViewReportStream(CustomQueryStream, ClickViewReportStream):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+        for custom_query in self.config["custom_queries"]:
+            stream_cls = (
+                _CustomClickViewReportStream
+                if "click_view" in custom_query["query"]
+                else CustomQueryStream
+            )
+            streams.append(stream_cls(tap=self, custom_query=custom_query))
 
         return streams

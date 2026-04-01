@@ -20,7 +20,7 @@ class AdGroupsPerformance(DynamicQueryStream):
             metrics.conversions,
             metrics.engagements,
             metrics.interactions,
-            metrics.video_views,
+            metrics.video_trueview_views,
             metrics.conversions_value,
             metrics.all_conversions,
             metrics.all_conversions_value,

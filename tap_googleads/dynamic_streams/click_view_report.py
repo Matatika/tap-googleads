@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import datetime
+import itertools
 from functools import cached_property
-from http import HTTPStatus
 
 from singer_sdk import typing as th
 
-from tap_googleads.client import ResumableAPIError
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -17,6 +16,8 @@ class ClickViewReportStream(DynamicQueryStream):
 
     date: datetime.date
 
+    add_date_filter_to_query = True
+
     def __init__(self, *args, **kwargs) -> None:
         self.date = datetime.date.today() - datetime.timedelta(days=1)
         super().__init__(*args, **kwargs)
@@ -24,7 +25,7 @@ class ClickViewReportStream(DynamicQueryStream):
     @property
     def gaql(self):
 
-        return f"""
+        return """
         SELECT
           click_view.gclid,
           segments.date,
@@ -42,7 +43,6 @@ class ClickViewReportStream(DynamicQueryStream):
           click_view.keyword,
           click_view.keyword_info.match_type
         FROM click_view
-        WHERE segments.date = '{self.date.isoformat()}'
         """
 
     @cached_property
@@ -58,7 +58,7 @@ class ClickViewReportStream(DynamicQueryStream):
     replication_key = "date"
 
     def post_process(self, row, context):
-        row["date"] = row["segments"].pop("date")
+        row["date"] = row["segments"]["date"]
 
         if row.get("clickView", {}).get("keyword") is None:
             row["clickView"]["keyword"] = "UNSPECIFIED"
@@ -85,7 +85,7 @@ class ClickViewReportStream(DynamicQueryStream):
     def request_records(self, context):
 
         ninety_days_ago = datetime.date.today() - datetime.timedelta(days=90)
-        start_value = datetime.date.fromisoformat(self.get_starting_replication_key_value(context))#context.get("bookmarks", {}).get(self.name, {}).get(self.replication_key)#self.get_starting_replication_key_value(context)
+        start_value = datetime.date.fromisoformat(self.get_starting_replication_key_value(context) or self.config["start_date"])
         if start_value < ninety_days_ago:
             start_date = ninety_days_ago
         else:
@@ -99,20 +99,20 @@ class ClickViewReportStream(DynamicQueryStream):
         for self.date in dates:
             self.logger.info(f"Requesting records for date: {self.date} | customer_id: {context.get('customer_id')}")
             records = super().request_records(context)
+            record = next(records, None)
 
-            if not records:
+            if not record:
                 self._increment_stream_state(
-                    {"date": self.date.isoformat()}, context=self.context
+                    {self.replication_key: self.date.isoformat()}, context=self.context
                 )
-            yield from records
-            
-    def validate_response(self, response):
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            error = response.json()["error"]["details"][0]["errors"][0]
-            msg = (
-                "Click view report not accessible to customer "
-                f"'{self.context['customer_id']}': {error['message']}"
-            )
-            raise ResumableAPIError(msg, response)
+                continue
 
-        super().validate_response(response)
+            yield from itertools.chain([record], records)
+
+    def _apply_date_filter_to_query(self, gaql):
+        clause = "AND" if "WHERE" in gaql.upper() else "WHERE"
+
+        return (
+            gaql.rstrip()
+            + f" {clause} segments.date = '{self.date.isoformat()}' ORDER BY segments.date ASC"
+        )

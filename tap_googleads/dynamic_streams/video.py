@@ -24,7 +24,7 @@ class VideoStream(DynamicQueryStream):
           video.resource_name,
           video.id, 
           segments.week, 
-          metrics.video_view_rate, 
+          metrics.video_trueview_view_rate, 
           ad_group.resource_name,
           ad_group.name, 
           metrics.clicks, 
@@ -47,7 +47,7 @@ class VideoStream(DynamicQueryStream):
           metrics.video_quartile_p100_rate, 
           metrics.all_conversions_value, 
           campaign.name, 
-          metrics.video_views, 
+          metrics.video_trueview_views, 
           video.duration_millis, 
           video.channel_id, 
           customer.descriptive_name, 
@@ -60,5 +60,5 @@ class VideoStream(DynamicQueryStream):
 
     name = "video"
     replication_key = "segments__date"
-    primary_keys = ["video__id", "adGroupAd__ad__id", "segments__device", "segments__ad_network_type", "segments__date"]
+    primary_keys = ["video__id", "adGroupAd__ad__id", "segments__device", "segments__adNetworkType", "segments__date"]
     add_date_filter_to_query = True

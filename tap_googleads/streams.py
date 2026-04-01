@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
+from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterable
@@ -52,6 +54,17 @@ class AccessibleCustomers(GoogleAdsStream):
             yield {"customer_id": customer_id}
 
 
+class SkippedReason(Enum):
+    """Reasons why a customer might be skipped"""
+
+    NOT_IN_CONFIG = "Not specified in customer_id(s) config"
+    MANAGER_ACCOUNT = "Manager account(s)"
+    NOT_ENABLED = "Not enabled"
+
+    def __str__(self):
+        return self.value
+
+
 # noinspection SqlNoDataSourceInspection
 class CustomerHierarchyStream(GoogleAdsStream):
     """
@@ -88,6 +101,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
     ).to_dict()
 
     seen_customer_ids = set()
+    skipped_customer_ids = defaultdict(list)
 
     @property
     def gaql(self):
@@ -101,47 +115,65 @@ class CustomerHierarchyStream(GoogleAdsStream):
                       customer_client.time_zone,
                       customer_client.id
                FROM customer_client
-               WHERE customer_client.level <= 1 \
                """
+
+    def get_records(self, context):
+        yield from super().get_records(context)
+
+        if self.skipped_customer_ids:
+            self.logger.info("Some customers were skipped")
+            for reason, customer_ids in self.skipped_customer_ids.items():
+                self.logger.info("%s (%d): %s", reason, len(customer_ids), customer_ids)
+
+        self.skipped_customer_ids.clear()
 
     def validate_response(self, response):
         if response.status_code == HTTPStatus.FORBIDDEN:
             msg = self.response_error_message(response)
             raise ResumableAPIError(msg, response)
 
+    def post_process(self, row, context=None):
+        row = super().post_process(row, context)
+        customer = row["customerClient"]
+        customer_id = customer["id"]
+
+        # sync only customers we haven't seen
+        if customer_id in self.seen_customer_ids:
+            return None
+
+        self.seen_customer_ids.add(customer_id)
+
+        if self.customer_ids and customer["id"] not in self.customer_ids:
+            self.skipped_customer_ids[SkippedReason.NOT_IN_CONFIG].append(
+                customer["id"]
+            )
+            return None
+
+        return row
+
     def generate_child_contexts(
             self,
             record: Record,
             context: Context | None,
     ) -> Iterable[Context | None]:
-        customer_ids = self.customer_ids
+        customer = record["customerClient"]
+        customer_id = customer["id"]
 
-        if customer_ids is None:
-            customer = record['customerClient']
+        if customer["manager"]:
+            self.skipped_customer_ids[SkippedReason.MANAGER_ACCOUNT].append(customer_id)
+            return
 
-            if customer['manager']:
-                self.logger.warning(f"{customer['clientCustomer']} is a manager, skipping")
-                yield None
+        if customer["status"] != "ENABLED":
+            self.skipped_customer_ids[SkippedReason.NOT_ENABLED].append(customer_id)
+            return
 
-            if customer['status'] != 'ENABLED':
-                self.logger.warning(f"{customer['clientCustomer']} is not enabled, skipping")
-                yield None
+        customer_context = {"customer_id": customer_id}
 
-            customer_ids = {customer['id']}
+        # Add parent manager account id if this is a child
+        if customer_id != context["customer_id"]:
+            customer_context["parent_customer_id"] = context["customer_id"]
 
-        # sync only customers we haven't seen
-        customer_ids = set(customer_ids) - self.seen_customer_ids
-
-        for customer_id in customer_ids:
-            customer_context = {"customer_id": customer_id}
-
-            # Add parent manager account id if this is a child
-            if customer_id != context['customer_id']:
-                customer_context['parent_customer_id'] = context['customer_id']
-
-            yield customer_context
-
-        self.seen_customer_ids.update(customer_ids)
+        yield customer_context
 
 
 class ReportsStream(GoogleAdsStream):
