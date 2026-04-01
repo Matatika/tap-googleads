@@ -109,9 +109,10 @@ tap-googleads --config CONFIG --discover > ./catalog.json
 
 ### Initialize your Development Environment
 
+[Install `uv`](https://docs.astral.sh/uv/getting-started/installation/)
+
 ```bash
-pipx install poetry
-poetry install
+uv sync --dev
 ```
 
 ### Create and Run Tests
@@ -120,13 +121,13 @@ Create tests within the `tap_googleads/tests` subfolder and
   then run:
 
 ```bash
-poetry run pytest
+uv run pytest
 ```
 
-You can also test the `tap-googleads` CLI interface directly using `poetry run`:
+You can also test the `tap-googleads` CLI interface directly using `uv`:
 
 ```bash
-poetry run tap-googleads --help
+uv run tap-googleads --help
 ```
 
 ### Testing with [Meltano](https://www.meltano.com)
