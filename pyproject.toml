@@ -1,6 +1,6 @@
 [project]
 name = "tap-googleads"
-version = "0.12.0"
+version = "0.13.0"
 description = "`tap-googleads` is a Singer tap for GoogleAds, built with the Meltano SDK for Singer Taps."
 authors = [
     { name = "AutoIDM" },
