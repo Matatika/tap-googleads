@@ -31,7 +31,7 @@ dev = [
     "pydocstyle>=6.1.1,<7",
     "mypy~=1.14",
     "types-requests>=2.32.0,<3",
-    "responses==0.26.0",
+    "responses==0.26.1",
 ]
 
 [build-system]
