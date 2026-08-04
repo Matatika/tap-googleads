@@ -1,6 +1,6 @@
 """Utilities used in this module"""
 
-from singer_sdk._singerlib import Catalog
+from singer_sdk.singerlib import Catalog
 from singer_sdk.helpers._catalog import (
     deselect_all_streams,
     set_catalog_stream_selected,
