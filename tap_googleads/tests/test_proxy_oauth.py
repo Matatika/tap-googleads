@@ -1,11 +1,12 @@
 """Tests the tap using a mock proxy oauth config."""
 
+import contextlib
+import io
+import json
 import unittest
 from unittest import mock
 
 import responses
-import singer_sdk.singerlib as singer
-from singer_sdk.io_base import SingerWriter
 
 import tap_googleads.tests.utils as test_utils
 from tap_googleads.tap import TapGoogleAds
@@ -25,12 +26,6 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
             "developer_token": "1234",
         }
         responses.reset()
-        del test_utils.SINGER_MESSAGES[:]
-        writer_patcher = mock.patch.object(
-            SingerWriter, "write_message", test_utils.accumulate_singer_messages
-        )
-        writer_patcher.start()
-        self.addCleanup(writer_patcher.stop)
 
         responses.add(
             responses.POST,
@@ -78,7 +73,9 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
             status=200,
         )
 
-        tap.sync_all()
+        captured_stdout = io.StringIO()
+        with contextlib.redirect_stdout(captured_stdout):
+            tap.sync_all()
 
         # Assert first oauth token call is using pre set refresh_proxy_url_auth
 
@@ -99,7 +96,11 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         )
 
         # Assert that messages are output from sync (its actually working).
-        self.assertEqual(len(test_utils.SINGER_MESSAGES), 3)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.SchemaMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.RecordMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.StateMessage)
+        singer_messages = [
+            json.loads(line) for line in captured_stdout.getvalue().splitlines()
+        ]
+
+        self.assertEqual(len(singer_messages), 3)
+        self.assertEqual(singer_messages[0]["type"], "SCHEMA")
+        self.assertEqual(singer_messages[1]["type"], "RECORD")
+        self.assertEqual(singer_messages[2]["type"], "STATE")
