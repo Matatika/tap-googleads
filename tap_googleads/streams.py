@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable
 from enum import Enum
 from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
@@ -34,8 +35,7 @@ class AccessibleCustomers(GoogleAdsStream):
         record: Record,
         context: Context | None,
     ) -> Iterable[Context | None]:
-        """
-        Generates child contexts from a given record and parent context.
+        """Generates child contexts from a given record and parent context.
 
         This method takes an input record and an optional parent context to produce
         one or more child contexts. The operation is aimed at further processing or
@@ -67,8 +67,7 @@ class SkippedReason(Enum):
 
 # noinspection SqlNoDataSourceInspection
 class CustomerHierarchyStream(GoogleAdsStream):
-    """
-    Customer Hierarchy.
+    """Customer Hierarchy.
 
     Inspiration from Google here
     https://developers.google.com/google-ads/api/docs/account-management/get-account-hierarchy.

@@ -9,8 +9,7 @@ class CustomQueryStream(DynamicQueryStream):
     add_date_filter_to_query = True
 
     def __init__(self, *args, **kwargs) -> None:
-        """
-        Initializes an instance of the class, allowing customization through various
+        """Initializes an instance of the class, allowing customization through various
         positional and keyword arguments provided during instantiation.
 
         Args:

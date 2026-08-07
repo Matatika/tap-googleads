@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 from functools import cached_property
-from typing import Any, Dict, List
+from typing import Any
 
 import humps
 import requests
@@ -61,9 +61,8 @@ class DynamicQueryStream(ReportsStream):
             + f" WHERE segments.date >= {self.start_date} AND segments.date <= {self.end_date} ORDER BY segments.date ASC"
         )
 
-    def get_fields_metadata(self, fields: List[str]) -> Dict[str, Dict[str, Any]]:
-        """
-        Get field metadata for gaql query columns.
+    def get_fields_metadata(self, fields: list[str]) -> dict[str, dict[str, Any]]:
+        """Get field metadata for gaql query columns.
 
         Issue Google API request to get detailed information on data type for gaql query columns.
         Uses direct REST API calls.
@@ -211,7 +210,7 @@ class DynamicQueryStream(ReportsStream):
 
         return local_json_schema
 
-    def post_process(  # noqa: PLR6301
+    def post_process(
         self,
         row,
         context=None,

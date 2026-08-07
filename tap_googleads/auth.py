@@ -1,7 +1,6 @@
 """GoogleAds Authentication."""
 
 import json
-from typing import Optional
 
 import requests
 from singer_sdk.authenticators import OAuthAuthenticator, SingletonMeta
@@ -15,10 +14,10 @@ class ProxyGoogleAdsAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
     def __init__(
         self,
         stream: RESTStreamBase,
-        auth_endpoint: Optional[str] = None,
-        oauth_scopes: Optional[str] = None,
-        auth_headers: Optional[dict] = None,
-        auth_body: Optional[dict] = None,
+        auth_endpoint: str | None = None,
+        oauth_scopes: str | None = None,
+        auth_headers: dict | None = None,
+        auth_body: dict | None = None,
     ) -> None:
         """Create a new authenticator.
 

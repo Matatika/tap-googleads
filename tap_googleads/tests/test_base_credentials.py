@@ -45,7 +45,6 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
 
     def test_base_credentials_discovery(self):
         """Test basic discover sync with Bearer Token"""
-
         catalog = TapGoogleAds(config=self.mock_config).discover_streams()
 
         # expect valid catalog to be discovered
@@ -54,7 +53,6 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
     @responses.activate
     def test_googleads_sync_accessible_customers(self):
         """Test sync."""
-
         tap = test_utils.set_up_tap_with_custom_catalog(
             self.mock_config, ["accessible_customers"]
         )
@@ -62,7 +60,7 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
         responses.add(
             responses.POST,
             "https://www.googleapis.com/oauth2/v4/token?refresh_token=1234&client_id=1234"
-            + "&client_secret=1234&grant_type=refresh_token",
+             "&client_secret=1234&grant_type=refresh_token",
             json={"access_token": 12341234, "expires_in": 3622},
             status=200,
         )

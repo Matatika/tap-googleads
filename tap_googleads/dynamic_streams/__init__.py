@@ -12,7 +12,9 @@ from tap_googleads.dynamic_streams.ad_listing_group_criterion import (
 from tap_googleads.dynamic_streams.audience import AudienceStream
 from tap_googleads.dynamic_streams.campaign_budget import CampaignBudgetStream
 from tap_googleads.dynamic_streams.campaign_criterion import CampaignCriterionStream
+from tap_googleads.dynamic_streams.campaign_history import CampaignHistoryStream
 from tap_googleads.dynamic_streams.campaign_label import CampaignLabelStream
+from tap_googleads.dynamic_streams.campaign_performance import CampaignPerformance
 from tap_googleads.dynamic_streams.campaign_performance_by_age_range_and_device import (
     CampaignPerformanceByAgeRangeAndDevice,
 )
@@ -22,26 +24,24 @@ from tap_googleads.dynamic_streams.campaign_performance_by_gender_and_device imp
 from tap_googleads.dynamic_streams.campaign_performance_by_location import (
     CampaignPerformanceByLocation,
 )
-from tap_googleads.dynamic_streams.campaign_history import CampaignHistoryStream
 from tap_googleads.dynamic_streams.click_view_report import ClickViewReportStream
+from tap_googleads.dynamic_streams.customer import CustomerStream
+from tap_googleads.dynamic_streams.customer_label import CustomerLabelStream
+from tap_googleads.dynamic_streams.gender_view import GenderViewStream
 from tap_googleads.dynamic_streams.geo_performance import GeoPerformance
 from tap_googleads.dynamic_streams.geotargets import GeotargetsStream
-from tap_googleads.dynamic_streams.campaign_performance import CampaignPerformance
-from tap_googleads.dynamic_streams.user_interest import UserInterestStream
-from tap_googleads.dynamic_streams.customer_label import CustomerLabelStream
-from tap_googleads.dynamic_streams.customer import CustomerStream
-from tap_googleads.dynamic_streams.label import LabelStream
 from tap_googleads.dynamic_streams.keyword_view import KeywordViewStream
-from tap_googleads.dynamic_streams.gender_view import GenderViewStream
+from tap_googleads.dynamic_streams.label import LabelStream
 from tap_googleads.dynamic_streams.managed_placement_view import (
     ManagedPlacementViewStream,
 )
 from tap_googleads.dynamic_streams.search_term_view import SearchTermViewStream
+from tap_googleads.dynamic_streams.user_interest import UserInterestStream
 from tap_googleads.dynamic_streams.video import VideoStream
 
 __all__ = [
-    "AdGroupAdStream",
     "AdGroupAdLabelStream",
+    "AdGroupAdStream",
     "AdGroupCriterionStream",
     "AdGroupLabelStream",
     "AdGroupsPerformance",
@@ -50,22 +50,22 @@ __all__ = [
     "AudienceStream",
     "CampaignBudgetStream",
     "CampaignCriterionStream",
+    "CampaignHistoryStream",
     "CampaignLabelStream",
     "CampaignPerformance",
     "CampaignPerformanceByAgeRangeAndDevice",
     "CampaignPerformanceByGenderAndDevice",
     "CampaignPerformanceByLocation",
-    "CampaignHistoryStream",
     "ClickViewReportStream",
-    "GeoPerformance",
-    "GeotargetsStream",
-    "UserInterestStream",
     "CustomerLabelStream",
     "CustomerStream",
-    "LabelStream",
-    "KeywordViewStream",
     "GenderViewStream",
+    "GeoPerformance",
+    "GeotargetsStream",
+    "KeywordViewStream",
+    "LabelStream",
     "ManagedPlacementViewStream",
     "SearchTermViewStream",
+    "UserInterestStream",
     "VideoStream",
 ]
