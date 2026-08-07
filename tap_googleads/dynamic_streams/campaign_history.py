@@ -7,7 +7,7 @@ class CampaignHistoryStream(DynamicQueryStream):
 
     def _get_gaql(self):
         return """
-        SELECT 
+        SELECT
           campaign.resource_name,
           campaign.id,
           campaign.name,

@@ -9,16 +9,16 @@ class LabelStream(DynamicQueryStream):
     @property
     def gaql(self):
         return """
-        SELECT 
-          label.text_label.background_color, 
-          label.text_label.description, 
-          label.name, 
-          label.status, 
-          label.id, 
-          label.resource_name 
-        FROM label 
+        SELECT
+          label.text_label.background_color,
+          label.text_label.description,
+          label.name,
+          label.status,
+          label.id,
+          label.resource_name
+        FROM label
         """
 
     name = "label"
     primary_keys = ["label__id"]
-    replication_key = None 
+    replication_key = None

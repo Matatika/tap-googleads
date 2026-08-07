@@ -9,20 +9,20 @@ class GeoPerformance(DynamicQueryStream):
     @property
     def gaql(self):
         return f"""
-    SELECT 
+    SELECT
         campaign.resource_name,
-        campaign.name, 
-        campaign.status, 
-        segments.date, 
-        metrics.clicks, 
+        campaign.name,
+        campaign.status,
+        segments.date,
+        metrics.clicks,
         metrics.cost_micros,
-        metrics.impressions, 
+        metrics.impressions,
         metrics.conversions,
         geographic_view.resource_name,
         geographic_view.location_type,
         geographic_view.country_criterion_id
-    FROM geographic_view 
-    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date} 
+    FROM geographic_view
+    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date}
     """
 
     name = "geo_performance"

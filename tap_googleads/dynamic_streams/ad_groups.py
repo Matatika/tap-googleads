@@ -8,10 +8,10 @@ class AdGroupsStream(DynamicQueryStream):
 
     def _get_gaql(self):
         return """
-       SELECT 
-       ad_group.url_custom_parameters, 
-       ad_group.type, 
-       ad_group.tracking_url_template, 
+       SELECT
+       ad_group.url_custom_parameters,
+       ad_group.type,
+       ad_group.tracking_url_template,
        ad_group.targeting_setting.target_restrictions,
        ad_group.target_roas,
        ad_group.target_cpm_micros,
@@ -39,7 +39,7 @@ class AdGroupsStream(DynamicQueryStream):
        campaign.id,
        campaign.name,
        segments.date
-       FROM ad_group 
+       FROM ad_group
        """
 
     name = "adgroups"

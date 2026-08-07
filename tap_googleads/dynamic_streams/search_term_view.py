@@ -7,14 +7,14 @@ class SearchTermViewStream(DynamicQueryStream):
 
     def _get_gaql(self):
         return """
-        SELECT 
+        SELECT
             customer.resource_name,
-            customer.id, 
-            segments.date, 
-            customer.currency_code, 
+            customer.id,
+            segments.date,
+            customer.currency_code,
             customer.descriptive_name,
             ad_group.id,
-            ad_group.name, 
+            ad_group.name,
             ad_group.status,
             segments.ad_network_type,
             metrics.conversions_value,
@@ -25,9 +25,9 @@ class SearchTermViewStream(DynamicQueryStream):
             metrics.conversions,
             metrics.cost_micros,
             segments.device,
-            metrics.impressions, 
+            metrics.impressions,
             segments.keyword.ad_group_criterion,
-            segments.keyword.info.text, 
+            segments.keyword.info.text,
             search_term_view.resource_name,
             search_term_view.search_term,
             search_term_view.status,

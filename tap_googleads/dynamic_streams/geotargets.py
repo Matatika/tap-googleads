@@ -14,7 +14,7 @@ class GeotargetsStream(DynamicQueryStream):
     """Geotargets, worldwide, constant across all customers"""
 
     gaql = """
-    SELECT 
+    SELECT
         geo_target_constant.resource_name,
         geo_target_constant.canonical_name,
         geo_target_constant.country_code,
@@ -42,4 +42,4 @@ class GeotargetsStream(DynamicQueryStream):
 
         """
         yield from super().get_records(context)
-        self.selected = False  # sync once only 
+        self.selected = False  # sync once only
