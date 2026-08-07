@@ -32,7 +32,7 @@ from tap_googleads.dynamic_streams import (
     CustomerStream,
     LabelStream,
     KeywordViewStream,
-    #GenderViewStream,
+    # GenderViewStream,
     ManagedPlacementViewStream,
     SearchTermViewStream,
     VideoStream,

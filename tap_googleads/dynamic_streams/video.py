@@ -1,4 +1,5 @@
 """VideoStream for Google Ads tap."""
+
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -60,5 +61,11 @@ class VideoStream(DynamicQueryStream):
 
     name = "video"
     replication_key = "segments__date"
-    primary_keys = ["video__id", "adGroupAd__ad__id", "segments__device", "segments__adNetworkType", "segments__date"]
+    primary_keys = [
+        "video__id",
+        "adGroupAd__ad__id",
+        "segments__device",
+        "segments__adNetworkType",
+        "segments__date",
+    ]
     add_date_filter_to_query = True

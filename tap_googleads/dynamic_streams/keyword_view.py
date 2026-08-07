@@ -1,4 +1,5 @@
 """KeywordViewStream for Google Ads tap."""
+
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -56,5 +57,12 @@ class KeywordViewStream(DynamicQueryStream):
 
     name = "keyword_view"
     replication_key = "segments__date"
-    primary_keys = ["adGroupCriterion__criterionId","adGroup__id","segments__device","segments__slot", "segments__adNetworkType","segments__date"]
+    primary_keys = [
+        "adGroupCriterion__criterionId",
+        "adGroup__id",
+        "segments__device",
+        "segments__slot",
+        "segments__adNetworkType",
+        "segments__date",
+    ]
     add_date_filter_to_query = True

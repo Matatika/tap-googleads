@@ -28,7 +28,6 @@ class GeotargetsStream(DynamicQueryStream):
     name = "geo_target_constant"
     primary_keys = ["geoTargetConstant__id"]
 
-
     def get_records(self, context: Context) -> Iterable[Dict[str, Any]]:
         """Return a generator of record-type dictionary objects.
 

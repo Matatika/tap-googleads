@@ -30,9 +30,9 @@ class AccessibleCustomers(GoogleAdsStream):
     ).to_dict()
 
     def generate_child_contexts(
-            self,
-            record: Record,
-            context: Context | None,
+        self,
+        record: Record,
+        context: Context | None,
     ) -> Iterable[Context | None]:
         """
         Generates child contexts from a given record and parent context.
@@ -152,9 +152,9 @@ class CustomerHierarchyStream(GoogleAdsStream):
         return row
 
     def generate_child_contexts(
-            self,
-            record: Record,
-            context: Context | None,
+        self,
+        record: Record,
+        context: Context | None,
     ) -> Iterable[Context | None]:
         customer = record["customerClient"]
         customer_id = customer["id"]
@@ -178,4 +178,5 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
 class ReportsStream(GoogleAdsStream):
     """Base class for all report streams."""
+
     parent_stream_type = CustomerHierarchyStream

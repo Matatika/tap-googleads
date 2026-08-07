@@ -1,4 +1,5 @@
 """ManagedPlacementViewStream for Google Ads tap."""
+
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 

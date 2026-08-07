@@ -42,7 +42,7 @@ class GoogleAdsStream(RESTStream):
 
     @cached_property
     def url_base(self):
-        return f'https://googleads.googleapis.com/{self.config["api_version"]}'
+        return f"https://googleads.googleapis.com/{self.config['api_version']}"
 
     def response_error_message(self, response: requests.Response) -> str:
         """Build error message for invalid http statuses.

@@ -6,7 +6,9 @@ from tap_googleads.dynamic_streams.ad_group_criterion import AdGroupCriterionStr
 from tap_googleads.dynamic_streams.ad_group_label import AdGroupLabelStream
 from tap_googleads.dynamic_streams.ad_groups import AdGroupsStream
 from tap_googleads.dynamic_streams.ad_groups_performance import AdGroupsPerformance
-from tap_googleads.dynamic_streams.ad_listing_group_criterion import AdListingGroupCriterionStream
+from tap_googleads.dynamic_streams.ad_listing_group_criterion import (
+    AdListingGroupCriterionStream,
+)
 from tap_googleads.dynamic_streams.audience import AudienceStream
 from tap_googleads.dynamic_streams.campaign_budget import CampaignBudgetStream
 from tap_googleads.dynamic_streams.campaign_criterion import CampaignCriterionStream
@@ -31,9 +33,12 @@ from tap_googleads.dynamic_streams.customer import CustomerStream
 from tap_googleads.dynamic_streams.label import LabelStream
 from tap_googleads.dynamic_streams.keyword_view import KeywordViewStream
 from tap_googleads.dynamic_streams.gender_view import GenderViewStream
-from tap_googleads.dynamic_streams.managed_placement_view import ManagedPlacementViewStream
+from tap_googleads.dynamic_streams.managed_placement_view import (
+    ManagedPlacementViewStream,
+)
 from tap_googleads.dynamic_streams.search_term_view import SearchTermViewStream
 from tap_googleads.dynamic_streams.video import VideoStream
+
 __all__ = [
     "AdGroupAdStream",
     "AdGroupAdLabelStream",

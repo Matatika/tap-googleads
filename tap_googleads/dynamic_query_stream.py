@@ -104,7 +104,9 @@ class DynamicQueryStream(ReportsStream):
             raise FatalAPIError(msg)
 
         response_data = response.json()
-        fields_metadata = {item.get("name"): item for item in response_data.get("results", [])}
+        fields_metadata = {
+            item.get("name"): item for item in response_data.get("results", [])
+        }
 
         unrecognised_fields = sorted(set(fields) - fields_metadata.keys())
 
@@ -113,7 +115,9 @@ class DynamicQueryStream(ReportsStream):
 
         msg = f"Unrecognised fields: {unrecognised_fields}"
         self.logger.error(msg)
-        self.logger.error("Check Google Ads API version changes here: https://developers.google.com/google-ads/api/docs/upgrade")
+        self.logger.error(
+            "Check Google Ads API version changes here: https://developers.google.com/google-ads/api/docs/upgrade"
+        )
 
         raise RuntimeError(msg)
 
@@ -201,7 +205,9 @@ class DynamicQueryStream(ReportsStream):
 
         # these are injected from context
         local_json_schema["properties"]["customer_id"] = {"type": ["string", "null"]}
-        local_json_schema["properties"]["parent_customer_id"] = {"type": ["string", "null"]}
+        local_json_schema["properties"]["parent_customer_id"] = {
+            "type": ["string", "null"]
+        }
 
         return local_json_schema
 

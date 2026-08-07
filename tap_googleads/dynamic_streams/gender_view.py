@@ -1,4 +1,5 @@
 """GenderViewStream for Google Ads tap."""
+
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -43,6 +44,6 @@ class GenderViewStream(DynamicQueryStream):
         """
 
     name = "gender_view"
-    primary_keys = ["customer__id","segments__date"]
+    primary_keys = ["customer__id", "segments__date"]
     replication_key = "segments__date"
     add_date_filter_to_query = True
