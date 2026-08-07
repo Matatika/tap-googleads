@@ -130,8 +130,8 @@ class GoogleAdsStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
-        headers["login-customer-id"] = (
-            self.login_customer_id or (self.context and self.context.get("customer_id"))
+        headers["login-customer-id"] = self.login_customer_id or (
+            self.context and self.context.get("customer_id")
         )
         return headers
 
