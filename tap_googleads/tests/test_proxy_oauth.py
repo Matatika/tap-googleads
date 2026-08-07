@@ -52,7 +52,6 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
     @responses.activate
     def test_proxy_oauth_discovery(self):
         """Test basic discover sync with proxy refresh credentials"""
-
         catalog = TapGoogleAds(config=self.mock_config).discover_streams()
 
         # Assert the correct number of default streams found
@@ -61,7 +60,6 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
     @responses.activate
     def test_proxy_oauth_refresh(self):
         """Test proxy oauth refresh"""
-
         tap = test_utils.set_up_tap_with_custom_catalog(
             self.mock_config, ["accessible_customers"]
         )

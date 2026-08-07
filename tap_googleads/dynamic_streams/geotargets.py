@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any
 
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
@@ -14,7 +15,7 @@ class GeotargetsStream(DynamicQueryStream):
     """Geotargets, worldwide, constant across all customers"""
 
     gaql = """
-    SELECT 
+    SELECT
         geo_target_constant.resource_name,
         geo_target_constant.canonical_name,
         geo_target_constant.country_code,
@@ -28,8 +29,7 @@ class GeotargetsStream(DynamicQueryStream):
     name = "geo_target_constant"
     primary_keys = ["geoTargetConstant__id"]
 
-
-    def get_records(self, context: Context) -> Iterable[Dict[str, Any]]:
+    def get_records(self, context: Context) -> Iterable[dict[str, Any]]:
         """Return a generator of record-type dictionary objects.
 
         Each record emitted should be a dictionary of property names to their values.
@@ -42,4 +42,4 @@ class GeotargetsStream(DynamicQueryStream):
 
         """
         yield from super().get_records(context)
-        self.selected = False  # sync once only 
+        self.selected = False  # sync once only

@@ -13,8 +13,10 @@ CONFIG = {
     "start_date": "2025-01-01",
 }
 
+
 class StopAfterVerification(Exception):
     """Sentinel exception - stop once assertions are verified."""
+
 
 class AssertingGAQLDateFilterGoogleAdsStream(DynamicQueryStream):
     name = "assert_gaql_date_filter"

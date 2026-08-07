@@ -2,16 +2,27 @@
 name = "tap-googleads"
 version = "0.13.0"
 description = "`tap-googleads` is a Singer tap for GoogleAds, built with the Meltano SDK for Singer Taps."
+readme = "README.md"
 authors = [
     { name = "AutoIDM" },
     { name = "Matatika" },
 ]
-requires-python = ">=3.10,<4"
-license = "Apache-2.0"
 keywords = [
     "ELT",
     "GoogleAds",
 ]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+license = "Apache-2.0"
+requires-python = ">=3.10"
 dependencies = [
     "requests>=2.25.1,<3",
     "singer-sdk==0.54.5",
@@ -19,21 +30,88 @@ dependencies = [
     "pyhumps>=3.8.0,<4",
 ]
 
+[project.optional-dependencies]
+s3 = [
+    "s3fs~=2025.10.0",
+]
+
 [project.scripts]
+# CLI declaration
 tap-googleads = "tap_googleads.tap:TapGoogleAds.cli"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5,<9",
-    "tox>=4.25.0,<5",
-    "flake8>=5.0.4,<6",
-    "black~=24.8",
-    "pydocstyle>=6.1.1,<7",
-    "mypy~=1.14",
-    "types-requests>=2.32.0,<3",
-    "responses==0.26.1",
+    { include-group = "test" },
+]
+test = [
+    "pytest>=8",
+    "singer-sdk[testing]",
+    "responses",
+]
+typing = [
+    "mypy>=1.19.1",
+    "ty>=0.0.13",
+    "types-requests",
 ]
 
+[tool.pytest.ini_options]
+addopts = [
+    "--durations=10",
+]
+
+[tool.mypy]
+warn_unused_configs = true
+
+[tool.ruff.lint]
+ignore = [
+    "ANN001",  # missing-type-function-argument
+    "ANN002",  # missing-type-args
+    "ANN003",  # missing-type-kwargs
+    "ANN201",  # missing-return-type-undocumented-public-function
+    "ANN202",  # missing-return-type-private-function
+    "COM812",  # missing-trailing-comma
+]
+select = ["ALL"]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 [build-system]
-requires = ["hatchling"]
+requires = [
+    "hatchling>=1,<2",
+]
 build-backend = "hatchling.build"
+
+# This configuration can be used to customize tox tests as well as other test frameworks like flake8 and mypy
+[tool.tox]
+min_version = "4.22"
+requires = [
+    "tox>=4.22",
+    "tox-uv",
+]
+env_list = [
+    "typing",
+    "py314",
+    "py313",
+    "py312",
+    "py311",
+    "py310",
+]
+
+[tool.tox.env_run_base]
+runner = "uv-venv-lock-runner"
+pass_env = [
+    "TAP_GOOGLEADS_*",
+]
+dependency_groups = [ "test" ]
+commands = [ [ "pytest", { replace = "posargs", default = [ "tests" ], extend = true } ] ]
+
+[tool.tox.env.typing]
+dependency_groups = [ "test", "typing" ]
+commands = [
+    [ "mypy", { replace = "posargs", default = [ "tap_googleads", "tests" ], extend = true } ],
+    [ "ty", "check", { replace = "posargs", default = [ "tap_googleads", "tests" ], extend = true } ],
+]

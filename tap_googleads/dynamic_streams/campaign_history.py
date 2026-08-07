@@ -1,4 +1,5 @@
 """CampaignHistoryStream for Google Ads tap."""
+
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
 
 
@@ -7,7 +8,7 @@ class CampaignHistoryStream(DynamicQueryStream):
 
     def _get_gaql(self):
         return """
-        SELECT 
+        SELECT
           campaign.resource_name,
           campaign.id,
           campaign.name,
@@ -34,6 +35,6 @@ class CampaignHistoryStream(DynamicQueryStream):
         """
 
     name = "campaign_history"
-    primary_keys = ["campaign__id","segments__date"]
+    primary_keys = ["campaign__id", "segments__date"]
     replication_key = "segments__date"
     add_date_filter_to_query = True

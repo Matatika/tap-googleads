@@ -85,7 +85,10 @@ class ClickViewReportStream(DynamicQueryStream):
     def request_records(self, context):
 
         ninety_days_ago = datetime.date.today() - datetime.timedelta(days=90)
-        start_value = datetime.date.fromisoformat(self.get_starting_replication_key_value(context) or self.config["start_date"])
+        start_value = datetime.date.fromisoformat(
+            self.get_starting_replication_key_value(context)
+            or self.config["start_date"]
+        )
         if start_value < ninety_days_ago:
             start_date = ninety_days_ago
         else:
@@ -97,7 +100,9 @@ class ClickViewReportStream(DynamicQueryStream):
         dates = (start_date + datetime.timedelta(days=i) for i in range(delta.days))
 
         for self.date in dates:
-            self.logger.info(f"Requesting records for date: {self.date} | customer_id: {context.get('customer_id')}")
+            self.logger.info(
+                f"Requesting records for date: {self.date} | customer_id: {context.get('customer_id')}"
+            )
             records = super().request_records(context)
             record = next(records, None)
 

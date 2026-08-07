@@ -1,7 +1,6 @@
 """GoogleAds tap class."""
 
 from datetime import datetime, timedelta, timezone
-from typing import List
 
 from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
@@ -18,23 +17,23 @@ from tap_googleads.dynamic_streams import (
     AudienceStream,
     CampaignBudgetStream,
     CampaignCriterionStream,
+    CampaignHistoryStream,
     CampaignLabelStream,
     CampaignPerformance,
     CampaignPerformanceByAgeRangeAndDevice,
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
-    CampaignHistoryStream,
     ClickViewReportStream,
     CustomerLabelStream,
+    CustomerStream,
     GeoPerformance,
     GeotargetsStream,
-    UserInterestStream,
-    CustomerStream,
-    LabelStream,
     KeywordViewStream,
-    #GenderViewStream,
+    LabelStream,
+    # GenderViewStream,
     ManagedPlacementViewStream,
     SearchTermViewStream,
+    UserInterestStream,
     VideoStream,
 )
 from tap_googleads.streams import AccessibleCustomers, CustomerHierarchyStream
@@ -216,7 +215,7 @@ class TapGoogleAds(Tap):
 
         return super().setup_mapper()
 
-    def discover_streams(self) -> List[Stream]:
+    def discover_streams(self) -> list[Stream]:
         """Return a list of discovered streams."""
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         if self.config["enable_click_view_report_stream"]:

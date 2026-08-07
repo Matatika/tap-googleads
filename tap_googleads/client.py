@@ -3,7 +3,7 @@
 from datetime import datetime
 from functools import cached_property
 from http import HTTPStatus
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 from singer_sdk.authenticators import OAuthAuthenticator
@@ -42,7 +42,7 @@ class GoogleAdsStream(RESTStream):
 
     @cached_property
     def url_base(self):
-        return f'https://googleads.googleapis.com/{self.config["api_version"]}'
+        return f"https://googleads.googleapis.com/{self.config['api_version']}"
 
     def response_error_message(self, response: requests.Response) -> str:
         """Build error message for invalid http statuses.
@@ -62,9 +62,9 @@ class GoogleAdsStream(RESTStream):
                 f"Error {error['code']}: {error['message']} ({error['status']})"
             )
 
-            if "details" in error and error["details"]:
+            if error.get("details"):
                 detail = error["details"][0]
-                if "errors" in detail and detail["errors"]:
+                if detail.get("errors"):
                     error_detail = detail["errors"][0]
                     detailed_message = error_detail.get("message", "")
                     request_id = detail.get("requestId", "")
@@ -130,14 +130,14 @@ class GoogleAdsStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
-        headers["login-customer-id"] = (
-            self.login_customer_id or self.context and self.context.get("customer_id")
+        headers["login-customer-id"] = self.login_customer_id or (
+            self.context and self.context.get("customer_id")
         )
         return headers
 
     def get_url_params(
-        self, context: Optional[dict], next_page_token: Optional[Any]
-    ) -> Dict[str, Any]:
+        self, context: dict | None, next_page_token: Any | None
+    ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params: dict = {}
         if next_page_token:
@@ -196,7 +196,7 @@ class GoogleAdsStream(RESTStream):
 
         if customer_ids is None:
             if customer_id is None:
-                return
+                return None
             customer_ids = [customer_id]
 
         return {_sanitise_customer_id(c) for c in customer_ids}
@@ -206,7 +206,7 @@ class GoogleAdsStream(RESTStream):
         login_customer_id = self.config.get("login_customer_id")
 
         if login_customer_id is None:
-            return
+            return None
 
         return _sanitise_customer_id(login_customer_id)
 
