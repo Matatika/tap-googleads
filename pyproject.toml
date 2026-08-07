@@ -24,14 +24,14 @@ tap-googleads = "tap_googleads.tap:TapGoogleAds.cli"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5,<9",
+    "pytest>=8.3.5,<10",
     "tox>=4.25.0,<5",
-    "flake8>=5.0.4,<6",
-    "black~=24.8",
+    "flake8>=5.0.4,<8",
+    "black>=24.8,<27.0",
     "pydocstyle>=6.1.1,<7",
-    "mypy~=1.14",
+    "mypy>=1.14,<3.0",
     "types-requests>=2.32.0,<3",
-    "responses==0.26.1",
+    "responses==0.26.2",
 ]
 
 [build-system]
