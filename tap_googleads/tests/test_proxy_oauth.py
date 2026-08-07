@@ -1,10 +1,12 @@
 """Tests the tap using a mock proxy oauth config."""
 
+import contextlib
+import io
+import json
 import unittest
 from unittest import mock
 
 import responses
-import singer_sdk._singerlib as singer
 
 import tap_googleads.tests.utils as test_utils
 from tap_googleads.tap import TapGoogleAds
@@ -24,8 +26,6 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
             "developer_token": "1234",
         }
         responses.reset()
-        del test_utils.SINGER_MESSAGES[:]
-        TapGoogleAds.write_message = test_utils.accumulate_singer_messages
 
         responses.add(
             responses.POST,
@@ -73,7 +73,9 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
             status=200,
         )
 
-        tap.sync_all()
+        captured_stdout = io.StringIO()
+        with contextlib.redirect_stdout(captured_stdout):
+            tap.sync_all()
 
         # Assert first oauth token call is using pre set refresh_proxy_url_auth
 
@@ -94,10 +96,11 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         )
 
         # Assert that messages are output from sync (its actually working).
-        self.assertEqual(len(test_utils.SINGER_MESSAGES), 32)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.StateMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.SchemaMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.RecordMessage)
+        singer_messages = [
+            json.loads(line) for line in captured_stdout.getvalue().splitlines()
+        ]
 
-        for msg in test_utils.SINGER_MESSAGES[3:]:
-            self.assertIsInstance(msg, singer.StateMessage)
+        self.assertEqual(len(singer_messages), 3)
+        self.assertEqual(singer_messages[0]["type"], "SCHEMA")
+        self.assertEqual(singer_messages[1]["type"], "RECORD")
+        self.assertEqual(singer_messages[2]["type"], "STATE")

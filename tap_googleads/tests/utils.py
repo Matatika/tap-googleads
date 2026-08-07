@@ -1,23 +1,16 @@
 """Utilities used in this module"""
 
-from singer_sdk._singerlib import Catalog
 from singer_sdk.helpers._catalog import (
     deselect_all_streams,
     set_catalog_stream_selected,
 )
+from singer_sdk.singerlib import Catalog
 
 from tap_googleads.tap import TapGoogleAds
 
 accessible_customer_return_data = {
     "resourceNames": ["customers/1234512345", "customers/5432154321"]
 }
-
-SINGER_MESSAGES = []
-
-
-def accumulate_singer_messages(_, message):
-    """function to collect singer library write_message in tests"""
-    SINGER_MESSAGES.append(message)
 
 
 def set_up_tap_with_custom_catalog(mock_config, stream_list):

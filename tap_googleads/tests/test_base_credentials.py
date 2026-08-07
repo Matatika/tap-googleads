@@ -1,10 +1,12 @@
 """Tests the tap using a mock base credentials config."""
 
+import contextlib
+import io
+import json
 import unittest
 from unittest import mock
 
 import responses
-import singer_sdk._singerlib as singer
 from singer_sdk.exceptions import ConfigValidationError
 
 import tap_googleads.tests.utils as test_utils
@@ -25,9 +27,6 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
             "developer_token": "1234",
         }
         responses.reset()
-        del test_utils.SINGER_MESSAGES[:]
-
-        TapGoogleAds.write_message = test_utils.accumulate_singer_messages
 
         patcher = mock.patch(
             "tap_googleads.dynamic_query_stream.DynamicQueryStream.get_fields_metadata"
@@ -75,15 +74,18 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
             status=200,
         )
 
-        tap.sync_all()
+        captured_stdout = io.StringIO()
+        with contextlib.redirect_stdout(captured_stdout):
+            tap.sync_all()
 
-        self.assertEqual(len(test_utils.SINGER_MESSAGES), 32)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[0], singer.StateMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[1], singer.SchemaMessage)
-        self.assertIsInstance(test_utils.SINGER_MESSAGES[2], singer.RecordMessage)
+        singer_messages = [
+            json.loads(line) for line in captured_stdout.getvalue().splitlines()
+        ]
 
-        for msg in test_utils.SINGER_MESSAGES[3:]:
-            self.assertIsInstance(msg, singer.StateMessage)
+        self.assertEqual(len(singer_messages), 3)
+        self.assertEqual(singer_messages[0]["type"], "SCHEMA")
+        self.assertEqual(singer_messages[1]["type"], "RECORD")
+        self.assertEqual(singer_messages[2]["type"], "STATE")
 
     def test_valid_customer_id_config(self):
         non_hypenated_customer_id = "1234567890"
