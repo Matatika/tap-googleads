@@ -172,7 +172,7 @@ class TapGoogleAds(Tap):
                     th.Property(
                         "query",
                         th.StringType,
-                        description="A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to [Google's documentation](https://developers.google.com/google-ads/api/fields/v19/overview_query_builder).",
+                        description="A custom defined GAQL query for building the report. Do not include segments.date filter in the query, it is automatically added. For more information, refer to [Google's documentation](https://developers.google.com/google-ads/api/fields/v23/overview_query_builder).",
                     ),
                     th.Property(
                         "add_date_filter_to_query",
@@ -205,7 +205,7 @@ class TapGoogleAds(Tap):
             "api_version",
             th.StringType,
             description="API version to use - see [versioning](https://developers.google.com/google-ads/api/docs/concepts/versioning) and [release notes](https://developers.google.com/google-ads/api/docs/release-notes)/[upgrade your API version](https://developers.google.com/google-ads/api/docs/upgrade).",
-            default="v22",  # https://developers.google.com/google-ads/api/docs/release-notes#v22_2025-10-15
+            default="v23",  # https://developers.google.com/google-ads/api/docs/release-notes#v23-2026-01-28
         ),
     ).to_dict()
 
