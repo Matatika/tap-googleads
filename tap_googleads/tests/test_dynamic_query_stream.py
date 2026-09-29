@@ -104,13 +104,18 @@ class TestDyanmicQueryStream(unittest.TestCase):
         for api_version, expected, unexpected in [
             (
                 "v22",
-                {"campaign.start_date,"},
-                {"campaign.start_date_time"},
+                {"campaign.start_date,", "campaign.video_brand_safety_suitability"},
+                {"campaign.start_date_time", "customer.video_brand_safety_suitability"},
             ),
             (
                 "v23",
-                {"campaign.start_date_time"},
-                {"campaign.start_date,"},
+                {"campaign.start_date_time", "campaign.video_brand_safety_suitability"},
+                {"campaign.start_date,", "customer.video_brand_safety_suitability"},
+            ),
+            (
+                "v24",
+                {"campaign.start_date_time", "customer.video_brand_safety_suitability"},
+                {"campaign.start_date,", "campaign.video_brand_safety_suitability"},
             ),
         ]:
             with self.subTest(api_version=api_version):

@@ -26,6 +26,9 @@ VERSION_RENAMES = {
         "campaign.start_date": "campaign.start_date_time",
         "campaign.end_date": "campaign.end_date_time",
     },
+    "v24": {
+        "campaign.video_brand_safety_suitability": "customer.video_brand_safety_suitability",
+    },
 }
 
 

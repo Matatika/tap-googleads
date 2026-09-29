@@ -29,7 +29,7 @@ class CampaignHistoryStream(DynamicQueryStream):
           campaign.tracking_url_template,
           campaign.vanity_pharma.vanity_pharma_display_url_mode,
           campaign.vanity_pharma.vanity_pharma_text,
-          campaign.video_brand_safety_suitability,
+          customer.video_brand_safety_suitability,
           segments.date
         FROM campaign
         """
