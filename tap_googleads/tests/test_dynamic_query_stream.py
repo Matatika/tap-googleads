@@ -1,6 +1,7 @@
 import unittest
 
 from tap_googleads.dynamic_query_stream import DynamicQueryStream
+from tap_googleads.dynamic_streams import CampaignHistoryStream
 from tap_googleads.tap import TapGoogleAds
 
 CONFIG = {
@@ -98,3 +99,35 @@ class TestDyanmicQueryStream(unittest.TestCase):
 
             with self.assertRaises(StopAfterVerification):
                 stream.sync(partition["context"])
+
+    def test_versioned_gaql(self):
+        for api_version, expected, unexpected in [
+            (
+                "v22",
+                {"campaign.start_date,", "campaign.video_brand_safety_suitability"},
+                {"campaign.start_date_time", "customer.video_brand_safety_suitability"},
+            ),
+            (
+                "v23",
+                {"campaign.start_date_time", "campaign.video_brand_safety_suitability"},
+                {"campaign.start_date,", "customer.video_brand_safety_suitability"},
+            ),
+            (
+                "v24",
+                {"campaign.start_date_time", "customer.video_brand_safety_suitability"},
+                {"campaign.start_date,", "campaign.video_brand_safety_suitability"},
+            ),
+        ]:
+            with self.subTest(api_version=api_version):
+                tap = TapGoogleAds(
+                    config={**CONFIG, "api_version": api_version},
+                    catalog={
+                        "streams": [{"tap_stream_id": CampaignHistoryStream.name}]
+                    },
+                )
+                gaql = CampaignHistoryStream(tap=tap).versioned_gaql
+
+                for field in expected:
+                    self.assertIn(field, gaql)
+                for field in unexpected:
+                    self.assertNotIn(field, gaql)

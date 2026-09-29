@@ -21,7 +21,14 @@ VERSION_RENAMES = {
         "video_view_rate_in_feed": "video_trueview_view_rate_in_feed",
         "video_view_rate_in_stream": "video_trueview_view_rate_in_stream",
         "video_view_rate_shorts": "video_trueview_view_rate_shorts",
-    }
+    },
+    "v23": {
+        "campaign.start_date": "campaign.start_date_time",
+        "campaign.end_date": "campaign.end_date_time",
+    },
+    "v24": {
+        "campaign.video_brand_safety_suitability": "customer.video_brand_safety_suitability",
+    },
 }
 
 

@@ -3,6 +3,7 @@
 import contextlib
 import io
 import json
+import re
 import unittest
 from unittest import mock
 
@@ -66,7 +67,9 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            "https://googleads.googleapis.com/v22/customers:listAccessibleCustomers",
+            re.compile(
+                r"https://googleads\.googleapis\.com/v\d+/customers:listAccessibleCustomers"
+            ),
             json=test_utils.accessible_customer_return_data,
             status=200,
         )
