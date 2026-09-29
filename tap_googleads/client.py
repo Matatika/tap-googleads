@@ -178,13 +178,10 @@ class GoogleAdsStream(RESTStream):
 
     @property
     def start_date(self):
-        # Reading a bookmark creates a state partition for the context, and the
-        # SDK passes a context that it cannot serialise. The SDK has already
-        # created a partition for a stream with a replication key.
         start_value = (
-            self.replication_key
-            and self.get_starting_replication_key_value(self.context)
-        ) or self.config["start_date"]
+            self.get_starting_replication_key_value(self.context)
+            or self.config["start_date"]
+        )
 
         return datetime.fromisoformat(start_value).strftime(r"'%Y-%m-%d'")
 

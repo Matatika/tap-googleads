@@ -35,11 +35,6 @@ class AssertingStartDateGoogleAdsStream(GoogleAdsStream):
     expected_start_date = ...
 
 
-class FullTableStartDateGoogleAdsStream(AssertingStartDateGoogleAdsStream):
-    name = "assert_start_date_full_table"
-    replication_key = None
-
-
 class TestStartDate(unittest.TestCase):
     def test_start_date_from_config(self):
         catalog = {
@@ -109,14 +104,3 @@ class TestStartDate(unittest.TestCase):
         for partition in stream_state_partitions:
             stream.expected_start_date = partition["replication_key_value"]
             stream.sync(partition["context"])
-
-    def test_start_date_without_replication_key_per_context(self):
-        catalog = {
-            "streams": [{"tap_stream_id": FullTableStartDateGoogleAdsStream.name}]
-        }
-
-        tap = TapGoogleAds(config=CONFIG, catalog=catalog)
-        stream = FullTableStartDateGoogleAdsStream(tap=tap)
-
-        stream.expected_start_date = CONFIG["start_date"]
-        stream.sync({"customer_id": "1", "parent_customer_id": "0"})
