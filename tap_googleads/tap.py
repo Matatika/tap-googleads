@@ -204,7 +204,7 @@ class TapGoogleAds(Tap):
                     ),
                 ),
             ),
-            description="A list of custom queries to run. Each query will be assigned a stream with the name specified in the `name` field. A query replaces any default stream or earlier query of the same name.",
+            description="A list of custom queries to run. Each query will be assigned a stream with the name specified in the `name` field. A query replaces any defined stream of the same name, allowing customisation of default behaviour.",
             default=[],
         ),
         th.Property(
