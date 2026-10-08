@@ -1,8 +1,9 @@
 """GoogleAds tap class."""
 
+import sys
 from datetime import datetime, timedelta, timezone
 
-from singer_sdk import Stream, Tap
+from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 from tap_googleads.custom_query_stream import CustomQueryStream
@@ -37,6 +38,11 @@ from tap_googleads.dynamic_streams import (
     VideoStream,
 )
 from tap_googleads.streams import AccessibleCustomers, CustomerHierarchyStream
+
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
 
 STREAM_TYPES = [
     CampaignHistoryStream,
@@ -215,8 +221,8 @@ class TapGoogleAds(Tap):
 
         return super().setup_mapper()
 
-    def discover_streams(self) -> list[Stream]:
-        """Return a list of discovered streams."""
+    @override
+    def discover_streams(self):
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         if self.config["enable_click_view_report_stream"]:
             streams.append(ClickViewReportStream(tap=self))
@@ -238,4 +244,4 @@ class TapGoogleAds(Tap):
 
         # The SDK keeps the last stream of a name in `Tap.streams`, but it still
         # syncs every child stream of that name, so keep only the last one here.
-        return list({stream.name: stream for stream in streams}.values())
+        return {stream.name: stream for stream in streams}.values()
