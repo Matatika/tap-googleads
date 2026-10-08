@@ -224,9 +224,6 @@ class TapGoogleAds(Tap):
         if not self.config["custom_queries"]:
             return streams
 
-        custom_query_names = {q["name"] for q in self.config["custom_queries"]}
-        streams = [s for s in streams if s.name not in custom_query_names]
-
         class _CustomClickViewReportStream(CustomQueryStream, ClickViewReportStream):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
@@ -239,4 +236,6 @@ class TapGoogleAds(Tap):
             )
             streams.append(stream_cls(tap=self, custom_query=custom_query))
 
-        return streams
+        # The SDK keeps the last stream of a name in `Tap.streams`, but it still
+        # syncs every child stream of that name, so keep only the last one here.
+        return list({stream.name: stream for stream in streams}.values())

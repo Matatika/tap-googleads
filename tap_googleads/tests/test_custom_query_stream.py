@@ -14,11 +14,17 @@ CONFIG = {
     "developer_token": "test_developer_token",
     "start_date": "2025-01-01",
     "custom_queries": [
-        {
-            "name": "campaign_history",
-            "query": "SELECT campaign.id FROM campaign",
-        }
+        {"name": "campaign_history", "query": "SELECT campaign.id FROM campaign"},
+        {"name": "campaign_history", "query": "SELECT ad_group.id FROM ad_group"},
     ],
+}
+
+ROWS = {
+    "customer_client": {
+        "customerClient": {"id": "1", "manager": False, "status": "ENABLED"}
+    },
+    "campaign": {"campaign": {"id": "9"}},
+    "ad_group": {"adGroup": {"id": "7"}},
 }
 
 
@@ -29,15 +35,12 @@ def fields_metadata(request):
 
 
 def search(request):
-    if "FROM customer_client" in json.loads(request.body)["query"]:
-        customer = {"id": "1", "manager": False, "status": "ENABLED"}
-        return 200, {}, json.dumps({"results": [{"customerClient": customer}]})
-
-    return 200, {}, json.dumps({"results": [{"campaign": {"id": "9"}}]})
+    resource = re.search(r"FROM (\w+)", json.loads(request.body)["query"])[1]
+    return 200, {}, json.dumps({"results": [ROWS[resource]]})
 
 
 @responses.activate
-def test_custom_query_replaces_default_stream_of_same_name(capsys):
+def test_last_stream_of_a_name_is_synced(capsys):
     responses.post(
         re.compile(r".*/oauth2/v4/token.*"),
         json={"access_token": "token", "expires_in": 3600},
@@ -67,4 +70,4 @@ def test_custom_query_replaces_default_stream_of_same_name(capsys):
         for message in messages
         if message["type"] == "RECORD" and message["stream"] == "campaign_history"
     ]
-    assert records == [{"campaign__id": "9", "customer_id": "1"}]
+    assert records == [{"adGroup__id": "7", "customer_id": "1"}]
