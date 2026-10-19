@@ -25,6 +25,9 @@ class AccessibleCustomers(GoogleAdsStream):
     rest_method = "GET"
     path = "/customers:listAccessibleCustomers"
     name = "accessible_customers"
+    # The response is one object. The inherited "$[*]" yields its member values
+    # under singer-sdk >= 0.54 (RFC 9535 JSONPath), not the object itself.
+    records_jsonpath = "$"
     primary_keys = ["resourceNames"]
     schema = th.PropertiesList(
         th.Property("resourceNames", th.ArrayType(th.StringType)),
