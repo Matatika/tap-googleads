@@ -25,6 +25,9 @@ class AccessibleCustomers(GoogleAdsStream):
     rest_method = "GET"
     path = "/customers:listAccessibleCustomers"
     name = "accessible_customers"
+    # The response is one object. Since jsonpath-ng 1.11.0, the inherited "$[*]"
+    # yields its member values instead of the object itself.
+    records_jsonpath = "$"
     primary_keys = ["resourceNames"]
     schema = th.PropertiesList(
         th.Property("resourceNames", th.ArrayType(th.StringType)),
